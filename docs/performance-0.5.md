@@ -115,3 +115,15 @@ In a newly built 0.5 ISO, verify the system policy at `about:policies#active` an
 5. If Render/3D remains high when video is paused, measure Firefox-closed desktop idle separately and investigate compositor or desktop redraw before optimizing codecs further.
 
 No permanent tuning should be selected from the initial uncontrolled codec comparison.
+
+
+### Confirmed GPU engine behavior during YouTube playback
+
+On the actual Surface Pro 7, `intel_gpu_top` showed:
+- **VP9 playing, not scrolling:** Video engine approximately **5%**, Render/3D approximately **40–50%**.
+- **Video paused:** Video engine **0%**, Render/3D generally **3–20%**.
+- **Typing in Firefox/ChatGPT:** Render/3D about **20–40%**.
+
+The Video engine responding directly to playback is strong evidence that Firefox is using Intel's hardware video decoder. Render/3D activity also responds to rendering and UI updates, so its percentage cannot be interpreted as GPU wattage or a direct fault. No need to force graphics-driver changes without an identified regression.
+
+**Next experiment:** A/B battery draw with the existing `power-profiles-daemon` Balanced and Power Saver profiles. Keep brightness, video or browser workload, Wi-Fi and duration identical; record battery energy-based average over 10–15 minutes after a short settling period. Collect responsiveness/scrolling impressions as well as energy and restore Balanced after testing. Do not simultaneously change codec or other services.
