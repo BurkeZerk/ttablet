@@ -1,0 +1,7 @@
+# TTablet 0.5: Intel hardware video decode + read-only diagnostics
+# Do not enable power tuning or zram until hardware baseline is collected.
+intel-media-va-driver
+vainfo
+intel-gpu-tools
+upower
+pciutils

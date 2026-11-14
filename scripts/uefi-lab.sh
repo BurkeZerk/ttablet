@@ -8,11 +8,11 @@ VARS="$LAB/OVMF_VARS.4m.fd"
 OVMF_DIR="/usr/share/edk2/x64"
 CODE="$OVMF_DIR/OVMF_CODE.4m.fd"
 VARS_TEMPLATE="$OVMF_DIR/OVMF_VARS.4m.fd"
-VERSION="${TTABLET_VERSION:-0.4.0-dev}"
+VERSION="${TTABLET_VERSION:-0.5.0-dev}"
 ISO="${TTABLET_UEFI_ISO:-$ROOT/dist/ttablet-$VERSION-surface-amd64.iso}"
 
 usage() {
-  printf '%s\n' 'TTablet 0.4 UEFI installer lab (QEMU ONLY)' \
+  printf '%s\n' 'TTablet UEFI installer lab (QEMU ONLY)' \
     '  ./scripts/uefi-lab.sh init       Create a new virtual SSD and UEFI variables' \
     '  ./scripts/uefi-lab.sh live       Boot ISO with disposable virtual SSD' \
     '  ./scripts/uefi-lab.sh installed  Boot virtual SSD without ISO'

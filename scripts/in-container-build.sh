@@ -22,6 +22,11 @@ if [[ -d /src/config/hooks ]]; then
   done < <(find /src/config/hooks -type f -name '*.hook.chroot' -print0)
 fi
 
+# Install exactly the same diagnostic script we keep under version control.
+# This makes it available in both the live ISO and Calamares installations.
+install -Dm755 /src/scripts/diagnostics.sh \
+  /work/config/includes.chroot/usr/local/bin/ttablet-diagnostics
+
 cd /work
 lb config
 lb build
@@ -35,7 +40,7 @@ if [[ -z "$manifest" || ! -s "$manifest" ]]; then
   exit 1
 fi
 
-for package in linux-image-surface phosh-tablet iptsd calamares-settings-debian; do
+for package in linux-image-surface phosh-tablet iptsd calamares-settings-debian intel-media-va-driver vainfo intel-gpu-tools; do
   if ! grep -Eq "^${package}[[:space:]]" "$manifest"; then
     echo "ERROR: $package missing from Live Build package manifest" >&2
     exit 1
@@ -51,5 +56,5 @@ chown "${HOST_UID}:${HOST_GID}" \
   "${TTABLET_STEM}.iso" \
   "${TTABLET_STEM}.packages.txt" \
   "${TTABLET_STEM}.iso.sha256"
-printf 'Verified package manifest: linux-image-surface, phosh-tablet, iptsd, calamares-settings-debian\n'
+printf 'Verified base and 0.5 diagnostic packages in ISO manifest\n'
 printf 'ISO: /dist/%s.iso\n' "$TTABLET_STEM"
