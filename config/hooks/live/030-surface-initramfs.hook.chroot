@@ -1,0 +1,20 @@
+
+#!/bin/sh
+set -eu
+
+# Ensure every installed Surface kernel
+# has an initramfs before ISO assembly.
+
+for modules in /lib/modules/*-surface; do
+    [ -d "$modules" ] || continue
+
+    version="${modules##*/}"
+    image="/boot/initrd.img-$version"
+
+    if [ ! -f "$image" ]; then
+        echo "Generating initramfs for $version"
+        update-initramfs -c -k "$version"
+    fi
+
+    test -s "$image"
+done

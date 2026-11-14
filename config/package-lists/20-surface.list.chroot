@@ -1,0 +1,6 @@
+
+# Surface kernel and hardware integration
+linux-surface
+iptsd
+libwacom-surface
+initramfs-tools

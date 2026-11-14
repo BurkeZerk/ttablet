@@ -8,5 +8,7 @@ lb config noauto \
   --debian-installer none \
   --archive-areas "main contrib non-free non-free-firmware" \
   --bootappend-live "boot=live components" \
+  --linux-flavours surface \
+  --debootstrap-options "--include=ca-certificates" \
   "${@}"
 
