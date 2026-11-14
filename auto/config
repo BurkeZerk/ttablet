@@ -1,4 +1,3 @@
-
 #!/bin/sh
 
 lb config noauto \
@@ -7,8 +6,7 @@ lb config noauto \
   --binary-images iso-hybrid \
   --debian-installer none \
   --archive-areas "main contrib non-free non-free-firmware" \
-  --bootappend-live "boot=live components" \
+  --bootappend-live "boot=live components persistence persistence-label=ttablet-data" \
   --linux-flavours surface \
   --debootstrap-options "--include=ca-certificates" \
   "${@}"
-

@@ -1,4 +1,4 @@
-# Debian live-build output and chroot trees
+# Debian Live Build output
 /cache/
 /chroot/
 /binary/
@@ -10,7 +10,7 @@
 *.sha256
 *.zsync
 
-# Generated live-build configuration; keep authored package lists and archives
+# Generated Live Build configuration
 /config/binary
 /config/bootstrap
 /config/chroot
@@ -22,14 +22,15 @@
 /config/bootloaders
 /config/bootloaders.*
 
-# Generated build artifacts
+# Generated artifacts and metadata
 /.build/
+/dist/
 /binary.*
 /chroot.*
 /live-image-*
 /nano.*.save
 
-# Generated Debian Live Build hook links
+# Live Build-generated hook symlinks (not custom hooks)
 /config/hooks/normal/
 /config/hooks/live/0010-disable-kexec-tools.hook.chroot
 /config/hooks/live/0050-disable-sysvinit-tmpfs.hook.chroot

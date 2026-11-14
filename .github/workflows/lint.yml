@@ -1,0 +1,22 @@
+name: Check TTablet build scripts
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  shell-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Bash scripts
+        run: |
+          set -e
+          for file in scripts/*.sh; do
+            bash -n "$file"
+          done
+      - name: Check Live Build configuration syntax
+        run: sh -n auto/config
