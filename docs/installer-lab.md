@@ -54,46 +54,40 @@ Confirm the root filesystem is on the installed VirtIO disk, not a live overlay.
 - The virtual disk is unencrypted and may contain private data. Do not publish it.
 - This is a manual test only until hardware and installer results are verified.
 
-## Default Phosh session for installed users
+## Phosh session for newly installed accounts
 
-The live ISO configures Phosh for the temporary user named `user`, but Calamares creates an account with a new name. The original AccountsService templates were ineffective for this account-creation path and are no longer included.
+### What we verified
 
-TTablet configures GDM's `FallbackSession=phosh` using `config/hooks/live/035-default-phosh-session.hook.chroot`. This selects Phosh **for users without a saved session preference**. Users can still explicitly select GNOME from GDM. Calamares might write a saved session for autologin-enabled accounts, so both normal and optional autologin cases need separate testing.
+Calamares creates a new user whose name is not the live-session `user`. The original live account's session setting therefore does not apply. GDM's `FallbackSession=phosh` works for a manually created user, but did not select Phosh for the Calamares account. A **direct AccountsService setting of `[User] / XSession=phosh` for the installed user was verified to work across reboot**.
 
-### Quick diagnosis in an already installed VM
+### Post-install step added in this branch (not yet acceptance-tested)
 
-Open `/etc/gdm3/daemon.conf` as root, add `FallbackSession=phosh` under the existing `[daemon]` heading, and reboot. Test with a **newly created** temporary account:
+- `config/hooks/live/045-calamares-user-phosh.hook.chroot` adds a Calamares `shellprocess@ttablet-phosh` job **immediately after `displaymanager`**, when the target filesystem is mounted.
+- `/etc/calamares/modules/shellprocess-ttablet-phosh.conf` invokes the installed system's `/usr/local/libexec/ttablet-set-phosh-session` using Calamares' `${USER}` placeholder for the actual new account username.
+- The helper updates only the user's AccountsService `[User]` session preference, preserves unrelated settings, refuses unsafe usernames and symlinks, and writes with owner root and mode 0600.
+- GDM's fallback remains as a backup; the separate Calamares default desktop configuration remains for autologin tests.
 
-    sudo adduser phoshtest
+Calamares documents `${USER}` substitution and how `shellprocess` runs in the target system. If a later Debian Calamares settings release moves or removes the expected `displaymanager` job, the build hook fails instead of silently omitting the step.
 
-Log in as that new user without touching the session selector, then check:
+### Before running Calamares in the live VM
+
+    grep -A6 '^instances:' /etc/calamares/settings.conf
+    grep -A3 -B2 'shellprocess@ttablet-phosh' /etc/calamares/settings.conf
+    cat /etc/calamares/modules/shellprocess-ttablet-phosh.conf
+
+The `shellprocess@ttablet-phosh` entry must appear after `displaymanager` in the Calamares `exec` list.
+
+### Fresh installation acceptance tests
+
+Use a new disposable UEFI lab disk. During installation, choose a **new username**, not `user`. Initially leave autologin disabled. After Calamares finishes, shut down the VM and boot the installed virtual disk without the ISO attached.
+
+Before selecting any session manually, log in normally and verify:
 
     echo "$XDG_CURRENT_DESKTOP"
-
-If that works, build the latest 0.4 branch and test a **new installation** in a fresh disposable virtual SSD. Do not assume the fallback will override a user who has explicitly selected GNOME on a previous login.
-
-### Acceptance test
-
-With a fresh installation and a new account, confirm the initial login and a subsequent reboot both select Phosh automatically. If GNOME is still chosen, inspect `/var/lib/AccountsService/users/<username>` and `/etc/gdm3/daemon.conf` on the installed system before further changes. Keep 0.4 as draft until verified.
-
-## Calamares GNOME preference override
-
-**Investigation (2026-11-13):** A new manually created account launched Phosh when `FallbackSession=phosh` was set, but an account created by Calamares still launched GNOME. In Calamares' upstream GDM integration, enabling autologin writes an explicit AccountsService `XSession=` preference for the chosen desktop. Without `defaultDesktopEnvironment`, Calamares searches for installed desktops and discovers GNOME earlier than Phosh.
-
-TTablet now sets `defaultDesktopEnvironment` to `phosh` with executable `/usr/bin/phosh-session` in `/etc/calamares/modules/displaymanager.conf` during the ISO build. The build hook fails if an active `defaultDesktopEnvironment` already exists, to avoid silently duplicating YAML keys. GDM's `FallbackSession=phosh` remains in place for users without an explicit preference.
-
-On the LIVE ISO, before running Calamares:
-
-    grep -A3 '^defaultDesktopEnvironment:' /etc/calamares/modules/displaymanager.conf
-    ls /usr/share/wayland-sessions/phosh.desktop
-    test -x /usr/bin/phosh-session && echo "Phosh executable exists"
-
-After a **fresh VM installation**, inspect the new account:
-
+    echo "$DESKTOP_SESSION"
     sudo cat "/var/lib/AccountsService/users/$(whoami)"
-    grep -E 'AutomaticLogin|FallbackSession' /etc/gdm3/daemon.conf
-    echo "$XDG_CURRENT_DESKTOP"
+    stat -c '%U %a %n' "/var/lib/AccountsService/users/$(whoami)"
 
-Verify that fresh first login and a subsequent reboot both use Phosh without manual intervention. Test both installer modes (autologin enabled and disabled) before calling this fixed. Old installations may retain `XSession=gnome` and require a deliberate per-user change.
+Expected: Phosh selected, `XSession=phosh`, root-owned account preference with permissions 600. Reboot once more and verify it stays in Phosh.
 
-**Until testing, treat this as a candidate fix.**
+Also test an installation with automatic login enabled before declaring the session-selection work fully complete. If it fails, capture Calamares debug logs and do not merge the 0.4 PR.

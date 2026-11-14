@@ -1,0 +1,72 @@
+#!/bin/sh
+set -eu
+
+# Calamares creates the target user during its exec phase.
+# Add a shellprocess instance immediately after 'displaymanager',
+# while the target filesystem is still mounted. The USER variable
+# is expanded by Calamares from the username chosen during install.
+settings=/etc/calamares/settings.conf
+module=/etc/calamares/modules/shellprocess-ttablet-phosh.conf
+
+test -f "$settings"
+test -x /usr/local/libexec/ttablet-set-phosh-session
+test -f /usr/share/wayland-sessions/phosh.desktop
+test ! -e "$module"
+! grep -Eq 'shellprocess@ttablet-phosh|^[[:space:]]*- id:[[:space:]]*ttablet-phosh[[:space:]]*$' "$settings"
+
+mkdir -p /etc/calamares/modules
+cat > "$module" <<'CALAMARES_MODULE'
+# Calamares runs this after creating the account and configuring GDM.
+# Commands execute inside the target system; USER is Calamares-expanded.
+dontChroot: false
+timeout: 30
+verbose: true
+script:
+  - "/usr/local/libexec/ttablet-set-phosh-session ${USER}"
+CALAMARES_MODULE
+
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT HUP INT TERM
+
+# Preserve the original Debian module sequence while adding one
+# shellprocess instance and a single job after displaymanager.
+awk '
+  /^[[:space:]]*instances:[[:space:]]*$/ {
+    print
+    print "- id: ttablet-phosh"
+    print "  module: shellprocess"
+    print "  config: shellprocess-ttablet-phosh.conf"
+    instance_count++
+    next
+  }
+  /^[[:space:]]*sequence:[[:space:]]*$/ {
+    if (instance_count == 0) {
+      print "instances:"
+      print "- id: ttablet-phosh"
+      print "  module: shellprocess"
+      print "  config: shellprocess-ttablet-phosh.conf"
+      print ""
+      instance_count++
+    }
+    print
+    next
+  }
+  /^[[:space:]]*-[[:space:]]*displaymanager[[:space:]]*$/ {
+    print
+    indent = $0
+    sub(/[^[:space:]].*$/, "", indent)
+    print indent "- shellprocess@ttablet-phosh"
+    job_count++
+    next
+  }
+  { print }
+  END {
+    if (instance_count != 1 || job_count != 1) {
+      print "Calamares layout changed; refusing to guess job position." > "/dev/stderr"
+      exit 1
+    }
+  }
+' "$settings" > "$tmp"
+
+cat "$tmp" > "$settings"
+grep -q 'shellprocess@ttablet-phosh' "$settings"
