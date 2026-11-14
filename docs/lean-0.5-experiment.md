@@ -21,6 +21,8 @@ See `config/package-lists/12-just-works.list.chroot` for what we deliberately pr
 
 No services are disabled or masked in this experiment; no changes to kernel, CPU governor, power profiles, zram, display resolution, firmware, or Firefox codec policy.
 
+**Specific optional applications to omit:** Phone Tour (`phosh-tour`), GNOME Tour (`gnome-tour`), and Parental Controls (`malcontent-gui`). These are recommended apps, not mandatory Phosh components. `scripts/check-lean-manifest.sh` rejects a completed ISO if any of them is still installed. The `libmalcontent-0-0` shared library can remain because GNOME Settings and GNOME Software depend on it; do not try to remove the library just to eliminate the Parental Controls application.
+
 ### Likely omissions to inspect, not assume
 
 `epiphany-browser` (Firefox already provided), `gnome-contacts`, `phosh-tour`, `phrog`, `gnome-remote-desktop`, `gnome-user-share`, `rygel`, and optional printing helpers. Some may still be present through other dependencies. **Compare actual manifests.**
@@ -51,7 +53,14 @@ Then compare ISO sizes:
 
     ls -lh dist/ttablet-0.5.0-{dev,lean-a}-surface-amd64.iso
 
-Read the entire removed-package list and review anything important that vanished before real-device testing. Re-add required features explicitly instead of re-enabling all recommends.
+Read the entire removed-package list and review anything important that vanished before real-device testing.
+
+The build should log `Verified lean image omits Parental Controls and Phone/GNOME Tour applications`. Confirm directly with:
+
+    grep -E '^(phosh-tour|gnome-tour|malcontent-gui)(:[^[:space:]]+)?[[:space:]]' \
+        dist/ttablet-0.5.0-lean-a-surface-amd64.packages.txt
+
+Expected: **no output**. `libmalcontent-0-0` appearing is acceptable; it is a library and not the parental-controls GUI. Re-add required features explicitly instead of re-enabling all recommends.
 
 ## Smoke test and go/no-go gate
 
@@ -71,3 +80,24 @@ Read the entire removed-package list and review anything important that vanished
 - Release profile separation for QEMU and video-diagnostic tools
 
 Only adopt lean-build changes after functionality and manifest comparisons justify them. The previous tested TTablet 0.5 build remains our rollback.
+
+## Installed-Surface testing strategy (planned, not yet proven)
+
+TTablet's current 0.4 install milestone was tested in a **disposable UEFI virtual machine**; booting a live USB on the Surface does **not** mean its Calamares installation path is proven on the actual device.
+
+The preference is to perform **future performance measurements on an installed Surface**, which should eliminate some live USB and overlayfs startup overhead. The correct order is:
+1. Finish lean-image package comparison and basic QEMU live boot.
+2. Confirm a clean Calamares install and new-account Phosh login in a fresh disposable UEFI VM using this exact lean image.
+3. Boot the lean ISO live on the Surface first and confirm critical hardware, Wi-Fi, touch, rotation, Bluetooth, sound, battery reporting, working software updater and suspend.
+4. **Before any Surface SSD install, back up all important files, verify the backup is readable, make a bootable recovery medium, and retain the known-working 0.4/0.5 USB.** If the Surface has Windows/BitLocker or another OS to preserve, have its recovery key and a tested recovery/restore plan ready. Record the current partitions and EFI setup.
+5. Review the Calamares **installation summary and exact disk/partition targets** carefully; a mistaken selection could destroy the internal OS and data. Do not use automatic erase-disk options unless the whole internal SSD can intentionally be wiped and has been backed up. The assistant will not automate repartitioning.
+6. Test first boot and Phosh login from the internal SSD, Wi-Fi, touch/keyboard, user persistence, APT updates, and suspend/reboot. Keep live USB as a fallback until repeated boots succeed.
+7. Only after a stable install, collect a fresh installed-system baseline: time to *usable desktop*, idle power at fixed brightness, mixed browser/video draw, and background CPU/service activity. Compare against installed vs installed in subsequent experiments, not against a live USB as though they were equivalent.
+
+The physical install is **opt-in and higher risk**: it is not a routine acceptance step until backup and recovery have been prepared.
+
+## Single application manager direction
+
+Retain **GNOME Software** as the single touch-facing UI for Debian packages and firmware updates. The current build explicitly keeps `gnome-software`, `gnome-software-plugin-deb`, and `gnome-software-plugin-fwupd`. Debian 13 also offers `gnome-software-plugin-flatpak`, which depends on Flatpak, to allow the same front end to list and update sandboxed apps.
+
+Adding Flatpak/Flathub will improve application coverage but also brings storage and maintenance costs. **Do not add it during this lean experiment**; assess it as a future user-facing functionality milestone. Do not add a second app-store frontend.

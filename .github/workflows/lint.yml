@@ -59,3 +59,20 @@ jobs:
           assert av1 == {"Value": False, "Status": "default"}, av1
           print("Verified reversible AV1-disabled Firefox default")
           PY
+      - name: Test excluded optional lean packages
+        run: |
+          set -e
+          good=$(mktemp)
+          bad=$(mktemp)
+          trap 'rm -f "$good" "$bad"' EXIT
+          printf 'phosh-tablet 46.1\ngnome-software 48.3\nlibmalcontent-0-0:amd64 0.13\n' > "$good"
+          bash scripts/check-lean-manifest.sh "$good"
+          for app in malcontent-gui phosh-tour gnome-tour; do
+            cp "$good" "$bad"
+            printf '%s:amd64 1.0\n' "$app" >> "$bad"
+            if bash scripts/check-lean-manifest.sh "$bad"; then
+              echo "ERROR: excluded $app escaped manifest check" >&2
+              exit 1
+            fi
+          done
+          echo "Exclusion checks passed"

@@ -12,7 +12,7 @@ A small, experimental Debian-based Linux tablet distribution for Microsoft Surfa
     ./scripts/build.sh
     ./scripts/test-qemu.sh
 
-See [build and persistence instructions](docs/build-and-persistence.md), the [UEFI installation lab](docs/installer-lab.md), and the [0.5 performance test plan](docs/performance-0.5.md).
+See [build and persistence instructions](docs/build-and-persistence.md), the [UEFI installation lab](docs/installer-lab.md), the [0.5 performance test plan](docs/performance-0.5.md), and the [lean image experiment and installed-Surface safety checklist](docs/lean-0.5-experiment.md).
 
 ## Project principles
 

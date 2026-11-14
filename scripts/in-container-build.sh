@@ -43,6 +43,8 @@ fi
 # Package manifest tokens can be architecture-qualified (e.g.,
 # intel-media-va-driver:amd64), so validate using the package-name field.
 bash /src/scripts/check-manifest.sh "$manifest"
+# Experimental lean image: fail if the optional apps are still installed.
+bash /src/scripts/check-lean-manifest.sh "$manifest"
 
 cp -- "$iso" "/dist/${TTABLET_STEM}.iso"
 cp -- "$manifest" "/dist/${TTABLET_STEM}.packages.txt"
