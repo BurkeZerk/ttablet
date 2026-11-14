@@ -18,5 +18,10 @@ jobs:
           for file in scripts/*.sh; do
             bash -n "$file"
           done
-      - name: Check Live Build configuration syntax
-        run: sh -n auto/config
+      - name: Check Live Build configuration and POSIX hooks
+        run: |
+          sh -n auto/config
+          for file in config/hooks/live/*.hook.chroot; do
+            sh -n "$file"
+          done
+          sh -n config/includes.chroot/usr/local/libexec/ttablet-set-phosh-session

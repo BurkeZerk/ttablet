@@ -1,0 +1,56 @@
+#!/bin/sh
+set -eu
+
+# Run by the Calamares shellprocess module in the installed system.
+# Update only the selected user's [User] section; preserve any other
+# AccountsService settings (including language, icon, or input sources).
+username=${1:-}
+case "$username" in
+  ""|root|*[!a-zA-Z0-9_.-]*)
+    echo "Refusing invalid or privileged username" >&2
+    exit 1
+    ;;
+esac
+
+id "$username" >/dev/null 2>&1 || {
+  echo "Calamares account not found: $username" >&2
+  exit 1
+}
+
+dir=/var/lib/AccountsService/users
+file="$dir/$username"
+install -d -m 755 "$dir"
+if [ -L "$file" ]; then
+  echo "Refusing symlink at $file" >&2
+  exit 1
+fi
+
+umask 077
+if [ -e "$file" ]; then
+  grep -qx '\[User\]' "$file" || {
+    echo "AccountsService file has no [User] section: $file" >&2
+    exit 1
+  }
+  tmp=$(mktemp "$dir/.ttablet-phosh.XXXXXXXX")
+  trap 'rm -f "$tmp"' EXIT HUP INT TERM
+  awk '
+    /^\[User\]$/ {
+      in_user=1
+      print
+      print "XSession=phosh"
+      next
+    }
+    /^\[/ { in_user=0 }
+    in_user && /^[[:space:]]*(XSession|Session)[[:space:]]*=/ { next }
+    { print }
+  ' "$file" > "$tmp"
+  chown root:root "$tmp"
+  chmod 600 "$tmp"
+  mv -f "$tmp" "$file"
+else
+  printf '[User]\nXSession=phosh\n' > "$file"
+  chown root:root "$file"
+  chmod 600 "$file"
+fi
+
+echo "TTablet: default session for $username set to phosh"
