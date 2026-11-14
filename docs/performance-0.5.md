@@ -134,3 +134,18 @@ The Video engine responding directly to playback is strong evidence that Firefox
 A 10-minute battery energy test with the existing `power-profiles-daemon` set to `power-saver` reported **13.62 W average**. The preceding **14.28 W** measurement was taken with AV1 disabled during *YouTube plus Reddit browsing*, so the apparent 0.66 W difference is **not a controlled A/B comparison** and must not be claimed as a proven power saving.
 
 Next: switch back to `balanced`, play the **same VP9 video** at the **same resolution and brightness**, avoid scrolling or other activity for the same ten-minute interval, and calculate average power from `BAT1/energy_now`. Compare responsiveness and playback smoothness as well. Repeat measurements if results are close. No permanent change to default profile yet.
+
+
+### Balanced comparison after Power Saver (same YouTube video)
+
+The user switched from Power Saver back to Balanced and repeated the 10-minute `BAT1/energy_now` discharge test with the **same video** and intended matching playback conditions.
+
+| Power profile | Average energy-based draw | Observation |
+| --- | ---: | --- |
+| Power Saver | 13.62 W | No perceptible responsiveness difference |
+| Balanced | 12.54 W | No perceptible responsiveness difference |
+
+- Balanced was **1.08 W (7.9%) lower** in this particular pair of runs.
+- Treat this as preliminary evidence rather than a universal efficiency advantage: successive battery-test runs can differ in background CPU activity, battery gauge behavior, thermals, streaming and display behavior.
+- Maintain **Balanced as the default** until further repeatable results establish otherwise. Do not automate a switch to Power Saver.
+- If pursuing the question further, repeat with a **Balanced → Power Saver → Balanced** or alternating test sequence, identical brightness, video, resolution, volume and browser activity, with the same sampling period and a short settling interval after each switch. Capture the displayed power profile with `powerprofilesctl get` at the start of each run.
