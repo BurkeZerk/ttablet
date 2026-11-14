@@ -2,7 +2,7 @@
 
 A small, experimental Debian-based Linux tablet distribution for Microsoft Surface hardware, initially the Surface Pro 7.
 
-**Status:** experimental. Built around the Linux-Surface kernel, Phosh, and Debian 13 (Trixie). It is not yet an installer and should not be relied on for irreplaceable data.
+**Status:** experimental. Built around the Linux-Surface kernel, Phosh, and Debian 13 (Trixie). The 0.4 branch includes an experimental Calamares installer candidate for disposable virtual machines only; do not install on real hardware yet.
 
 ## Quick start on CachyOS
 
@@ -12,7 +12,7 @@ A small, experimental Debian-based Linux tablet distribution for Microsoft Surfa
     ./scripts/build.sh
     ./scripts/test-qemu.sh
 
-See [build and persistence instructions](docs/build-and-persistence.md) for build details, optional persistent storage, safety notes, and test steps.
+See [build and persistence instructions](docs/build-and-persistence.md) for the existing live-image workflow, and the [UEFI installation lab](docs/installer-lab.md) for 0.4 testing.
 
 ## Project principles
 

@@ -35,7 +35,7 @@ if [[ -z "$manifest" || ! -s "$manifest" ]]; then
   exit 1
 fi
 
-for package in linux-image-surface phosh-tablet iptsd; do
+for package in linux-image-surface phosh-tablet iptsd calamares-settings-debian; do
   if ! grep -Eq "^${package}[[:space:]]" "$manifest"; then
     echo "ERROR: $package missing from Live Build package manifest" >&2
     exit 1
@@ -51,5 +51,5 @@ chown "${HOST_UID}:${HOST_GID}" \
   "${TTABLET_STEM}.iso" \
   "${TTABLET_STEM}.packages.txt" \
   "${TTABLET_STEM}.iso.sha256"
-printf 'Verified package manifest: linux-image-surface, phosh-tablet, iptsd\n'
+printf 'Verified package manifest: linux-image-surface, phosh-tablet, iptsd, calamares-settings-debian\n'
 printf 'ISO: /dist/%s.iso\n' "$TTABLET_STEM"
