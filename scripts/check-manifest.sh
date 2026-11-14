@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Debian Live Build's package list can use architecture-qualified names:
+#   intel-media-va-driver:amd64 25.2.3+dfsg1-1
+# Compare the name field, stripping only a trailing architecture qualifier.
+if (( $# != 1 )) || [[ ! -s "${1:-}" ]]; then
+  echo "Usage: check-manifest.sh <nonempty-live-build-package-manifest>" >&2
+  exit 2
+fi
+manifest="$1"
+
+required=(
+  linux-image-surface
+  phosh-tablet
+  iptsd
+  calamares-settings-debian
+  intel-media-va-driver
+  vainfo
+  intel-gpu-tools
+)
+
+for package in "${required[@]}"; do
+  if ! awk -v expected="$package" '
+    {
+      installed = $1
+      sub(/:[[:alnum:]_-]+$/, "", installed)
+      if (installed == expected) { found=1; exit }
+    }
+    END { exit(found ? 0 : 1) }
+  ' "$manifest"; then
+    echo "ERROR: $package missing from Live Build package manifest" >&2
+    exit 1
+  fi
+done
+
+echo "Verified base and 0.5 diagnostic packages in ISO manifest"

@@ -40,12 +40,9 @@ if [[ -z "$manifest" || ! -s "$manifest" ]]; then
   exit 1
 fi
 
-for package in linux-image-surface phosh-tablet iptsd calamares-settings-debian intel-media-va-driver vainfo intel-gpu-tools; do
-  if ! grep -Eq "^${package}[[:space:]]" "$manifest"; then
-    echo "ERROR: $package missing from Live Build package manifest" >&2
-    exit 1
-  fi
-done
+# Package manifest tokens can be architecture-qualified (e.g.,
+# intel-media-va-driver:amd64), so validate using the package-name field.
+bash /src/scripts/check-manifest.sh "$manifest"
 
 cp -- "$iso" "/dist/${TTABLET_STEM}.iso"
 cp -- "$manifest" "/dist/${TTABLET_STEM}.packages.txt"
