@@ -47,3 +47,15 @@ jobs:
             exit 1
           fi
           echo "Manifest positive and negative checks passed"
+      - name: Validate Firefox media defaults
+        run: |
+          set -e
+          python3 -m json.tool config/includes.chroot/etc/firefox/policies/policies.json > /dev/null
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path("config/includes.chroot/etc/firefox/policies/policies.json").read_text())
+          av1 = p["policies"]["Preferences"]["media.av1.enabled"]
+          assert av1 == {"Value": False, "Status": "default"}, av1
+          print("Verified reversible AV1-disabled Firefox default")
+          PY
