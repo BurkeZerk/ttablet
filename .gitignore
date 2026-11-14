@@ -1,0 +1,23 @@
+# Debian live-build output and chroot trees
+/cache/
+/chroot/
+/binary/
+/source/
+*.iso
+*.img
+*.log
+*.md5
+*.sha256
+*.zsync
+
+# Generated live-build configuration; keep authored package lists and archives
+/config/binary
+/config/bootstrap
+/config/chroot
+/config/common
+/config/source
+/config/debian-installer
+/config/rootfs
+/config/apt
+/config/bootloaders
+/config/bootloaders.*

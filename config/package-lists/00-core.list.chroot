@@ -1,0 +1,8 @@
+# Utilities for an initial test image
+sudo
+network-manager
+ca-certificates
+curl
+less
+nano
+openssh-client

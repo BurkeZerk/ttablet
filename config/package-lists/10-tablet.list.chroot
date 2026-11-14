@@ -1,0 +1,31 @@
+
+# Touch-first graphical environment
+phosh-tablet
+gdm3
+squeekboard
+
+# Browsing
+firefox-esr
+
+# Networking
+network-manager
+
+# Sound and media
+pipewire-audio
+mpv
+
+# Documents
+evince
+
+# Hardware integration
+iio-sensor-proxy
+firmware-iwlwifi
+firmware-misc-nonfree
+
+# Live system utilities
+sudo
+user-setup
+
+# Virtual machine testing
+spice-vdagent
+
