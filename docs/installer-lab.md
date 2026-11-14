@@ -54,28 +54,24 @@ Confirm the root filesystem is on the installed VirtIO disk, not a live overlay.
 - The virtual disk is unencrypted and may contain private data. Do not publish it.
 - This is a manual test only until hardware and installer results are verified.
 
-## Phosh must be the installed account's default
+## Default Phosh session for installed users
 
-Calamares creates a new account whose name differs from the live ISO account (`user`). An AccountsService preference for the live account alone does not carry over. TTablet provides `/etc/accountsservice/user-templates/{standard,administrator}` with `Session=phosh` and `XSession=phosh` as defaults for new users. This is a default, not a lock: GDM should still let users choose GNOME manually.
+The live ISO configures Phosh for the temporary user named `user`, but Calamares creates an account with a new name. The original AccountsService templates were ineffective for this account-creation path and are no longer included.
 
-**Test on a brand-new 0.4 installation, not just an existing user.** Verify first login and reboot both start Phosh without using GDM's gear selector. In the installed system:
+TTablet configures GDM's `FallbackSession=phosh` using `config/hooks/live/035-default-phosh-session.hook.chroot`. This selects Phosh **for users without a saved session preference**. Users can still explicitly select GNOME from GDM. Calamares might write a saved session for autologin-enabled accounts, so both normal and optional autologin cases need separate testing.
+
+### Quick diagnosis in an already installed VM
+
+Open `/etc/gdm3/daemon.conf` as root, add `FallbackSession=phosh` under the existing `[daemon]` heading, and reboot. Test with a **newly created** temporary account:
+
+    sudo adduser phoshtest
+
+Log in as that new user without touching the session selector, then check:
 
     echo "$XDG_CURRENT_DESKTOP"
-    cat "/var/lib/AccountsService/users/$(id -un)"
 
-If Phosh is not selected on an existing already-installed account, apply a per-user preference:
+If that works, build the latest 0.4 branch and test a **new installation** in a fresh disposable virtual SSD. Do not assume the fallback will override a user who has explicitly selected GNOME on a previous login.
 
-    sudo install -d -m 755 /var/lib/AccountsService/users
-    printf '[User]\nXSession=phosh\n' | sudo tee "/var/lib/AccountsService/users/$(id -un)"
+### Acceptance test
 
-Log out and back in, then reboot. AccountsService may save explicit per-user preferences, which take precedence over the template. Avoid overwriting an existing account file with additional user metadata: back it up first if present.
-
-If a *new* installation still defaults to GNOME, inspect `/etc/calamares/modules/displaymanager.conf` and the installed user's AccountsService record, then update the Calamares displaymanager configuration in a follow-up commit. Do not merge the 0.4 branch as finished before that test passes.
-
-## Default-session follow-up: GDM fallback
-
-The initial AccountsService user-template approach did **not** change the installed user's default when Calamares created the account. TTablet now configures GDM's `FallbackSession=phosh` using a live-build hook. GDM defaults to GNOME otherwise, and Calamares may not write a preference for an ordinary password-based login. This is a **candidate** until it passes a clean installation test.
-
-The fallback only applies when there is no saved session preference. An account that already chose GNOME can continue using GNOME. For a diagnostic before rebuilding, in an already-installed VM edit `/etc/gdm3/daemon.conf`, adding `FallbackSession=phosh` under its existing `[daemon]` section, then create a **new test account** with `sudo adduser phoshtest` and reboot. Log in as the new account to see the fallback. Check the session with `echo "$XDG_CURRENT_DESKTOP"`.
-
-For a complete acceptance test, build a fresh ISO and install to a **new** disposable virtual SSD; test first login without manually changing the GDM gear selector. Do not merge 0.4 until the default is confirmed.
+With a fresh installation and a new account, confirm the initial login and a subsequent reboot both select Phosh automatically. If GNOME is still chosen, inspect `/var/lib/AccountsService/users/<username>` and `/etc/gdm3/daemon.conf` on the installed system before further changes. Keep 0.4 as draft until verified.
