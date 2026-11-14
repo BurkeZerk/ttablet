@@ -97,3 +97,21 @@ To test immediately in an existing live session:
 6. To restore the original codec behavior, reset `media.av1.enabled` to `true` in `about:config`.
 
 In a newly built 0.5 ISO, verify the system policy at `about:policies#active` and check the effective `media.av1.enabled` in `about:config`. Because the policy uses `default`, a prior explicit user preference can override it. Do not merge the codec change as a proven power saving until the Surface A/B results support the claim.
+
+
+### Additional observed measurements (same live USB)
+
+- After manually disabling AV1 in the running Firefox profile and restarting Firefox twice, YouTube switched away from `av01`. A 10-minute YouTube/Reddit browsing run used **2.38 Wh = 14.28 W**, versus **14.40 W** in the earlier AV1 run. A difference of **0.12 W (0.8%)** is within uncontrolled workload variation: **no battery saving has been demonstrated from changing codec alone**.
+- During VP9 playback, `intel_gpu_top` reported approximately **5% Video** engine activity and **40–50% Render/3D** engine activity. Nonzero Video engine usage is consistent with hardware decoding; confirm it falls on pause and use Firefox `about:support` to inspect the hardware-decoding status. Render/3D measures engine busyness, not the fraction of total GPU power consumption.
+- With Firefox closed and screen on, the user measured **4.92 W average idle battery draw** over 10 minutes. The Surface's reported full-charge capacity was about **38.71 Wh**, making 7.9 h only a theoretical constant-idle extrapolation, not tested runtime.
+- Baseline active browsing/video draw is around **14.3–14.4 W**; it combines video, scrolling, screen, CPU, GPU rendering, and background services. The approximately **9.4 W difference** from idle cannot be attributed to video decoding alone.
+
+### Next controlled experiment
+
+1. Keep the Surface unplugged, brightness and power profile unchanged, and use **one known VP9 YouTube video at 1080p**; close other heavy tabs and stop scrolling.
+2. Observe Video and Render/3D engine utilization for 30–60 seconds while playing, and again with video **paused** for 30–60 seconds. A change in the Video engine is stronger evidence that the browser's decoding path is using Intel hardware than a single 5% value.
+3. Inspect Firefox `about:support` → Graphics/Media for `HARDWARE_VIDEO_DECODING` and `Compositing`. Do not force enable graphics prefs without evidence of an actual disabled/blocked feature.
+4. Measure battery energy loss with the video playing and browser otherwise untouched. Compare to the earlier mixed browsing test carefully; the workloads differ.
+5. If Render/3D remains high when video is paused, measure Firefox-closed desktop idle separately and investigate compositor or desktop redraw before optimizing codecs further.
+
+No permanent tuning should be selected from the initial uncontrolled codec comparison.
