@@ -1,0 +1,28 @@
+# Intentional TTablet tablet essentials with --apt-recommends false.
+# Keep touch-first settings, installing/updating software, and connectivity.
+# Debian Live's crucial user-setup/sudo are explicit in 10-tablet.list.chroot.
+#
+# Phosh's own hard dependencies remain installed via phosh-tablet.
+
+# Touch-accessible settings and terminal that Phosh otherwise recommends
+phosh-mobile-settings
+gnome-console
+
+# Bluetooth headphones and peripherals
+bluez
+
+# Secure privilege dialogs and graphical application/firmware updating
+polkitd
+gnome-software
+gnome-software-plugin-deb
+gnome-software-plugin-fwupd
+
+# File browsing and removable drives
+nautilus
+udisks2
+
+# Common graphical file dialogs and application portals
+xdg-desktop-portal-gtk
+
+# Retain tested Balanced/Power Saver controls even without recommends
+power-profiles-daemon
