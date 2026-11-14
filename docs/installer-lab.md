@@ -71,3 +71,11 @@ If Phosh is not selected on an existing already-installed account, apply a per-u
 Log out and back in, then reboot. AccountsService may save explicit per-user preferences, which take precedence over the template. Avoid overwriting an existing account file with additional user metadata: back it up first if present.
 
 If a *new* installation still defaults to GNOME, inspect `/etc/calamares/modules/displaymanager.conf` and the installed user's AccountsService record, then update the Calamares displaymanager configuration in a follow-up commit. Do not merge the 0.4 branch as finished before that test passes.
+
+## Default-session follow-up: GDM fallback
+
+The initial AccountsService user-template approach did **not** change the installed user's default when Calamares created the account. TTablet now configures GDM's `FallbackSession=phosh` using a live-build hook. GDM defaults to GNOME otherwise, and Calamares may not write a preference for an ordinary password-based login. This is a **candidate** until it passes a clean installation test.
+
+The fallback only applies when there is no saved session preference. An account that already chose GNOME can continue using GNOME. For a diagnostic before rebuilding, in an already-installed VM edit `/etc/gdm3/daemon.conf`, adding `FallbackSession=phosh` under its existing `[daemon]` section, then create a **new test account** with `sudo adduser phoshtest` and reboot. Log in as the new account to see the fallback. Check the session with `echo "$XDG_CURRENT_DESKTOP"`.
+
+For a complete acceptance test, build a fresh ISO and install to a **new** disposable virtual SSD; test first login without manually changing the GDM gear selector. Do not merge 0.4 until the default is confirmed.

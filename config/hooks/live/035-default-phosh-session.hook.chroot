@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+# GDM normally falls back to GNOME for accounts without a saved
+# session preference. TTablet's primary session is Phosh.
+# Keep GNOME available for accounts that explicitly choose it.
+config=/etc/gdm3/daemon.conf
+test -f "$config"
+test -f /usr/share/wayland-sessions/phosh.desktop
+
+if grep -Eq '^[[:space:]]*FallbackSession=' "$config"; then
+    sed -i 's/^[[:space:]]*FallbackSession=.*/FallbackSession=phosh/' "$config"
+else
+    grep -q '^\[daemon\]' "$config"
+    sed -i '/^\[daemon\]/a FallbackSession=phosh' "$config"
+fi
+
+grep -q '^FallbackSession=phosh$' "$config"

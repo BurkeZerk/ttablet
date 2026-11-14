@@ -1,5 +1,0 @@
-# TTablet default desktop for accounts that have not chosen a session.
-# Leave GNOME available as a fallback/recovery session.
-[User]
-Session=phosh
-XSession=phosh
