@@ -53,3 +53,21 @@ Confirm the root filesystem is on the installed VirtIO disk, not a live overlay.
 - No automated drive erase, real-hardware install, or dual-boot procedure is provided.
 - The virtual disk is unencrypted and may contain private data. Do not publish it.
 - This is a manual test only until hardware and installer results are verified.
+
+## Phosh must be the installed account's default
+
+Calamares creates a new account whose name differs from the live ISO account (`user`). An AccountsService preference for the live account alone does not carry over. TTablet provides `/etc/accountsservice/user-templates/{standard,administrator}` with `Session=phosh` and `XSession=phosh` as defaults for new users. This is a default, not a lock: GDM should still let users choose GNOME manually.
+
+**Test on a brand-new 0.4 installation, not just an existing user.** Verify first login and reboot both start Phosh without using GDM's gear selector. In the installed system:
+
+    echo "$XDG_CURRENT_DESKTOP"
+    cat "/var/lib/AccountsService/users/$(id -un)"
+
+If Phosh is not selected on an existing already-installed account, apply a per-user preference:
+
+    sudo install -d -m 755 /var/lib/AccountsService/users
+    printf '[User]\nXSession=phosh\n' | sudo tee "/var/lib/AccountsService/users/$(id -un)"
+
+Log out and back in, then reboot. AccountsService may save explicit per-user preferences, which take precedence over the template. Avoid overwriting an existing account file with additional user metadata: back it up first if present.
+
+If a *new* installation still defaults to GNOME, inspect `/etc/calamares/modules/displaymanager.conf` and the installed user's AccountsService record, then update the Calamares displaymanager configuration in a follow-up commit. Do not merge the 0.4 branch as finished before that test passes.
