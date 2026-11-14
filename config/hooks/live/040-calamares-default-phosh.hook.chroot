@@ -1,0 +1,29 @@
+#!/bin/sh
+set -eu
+
+# Calamares normally discovers an installed desktop environment,
+# and may pick GNOME before Phosh. When autologin is selected, its
+# GDM integration writes that desktop into the new user's
+# AccountsService preference, overriding GDM's FallbackSession.
+#
+# Set the installer default explicitly, not just the GDM fallback.
+config=/etc/calamares/modules/displaymanager.conf
+test -f "$config"
+test -f /usr/share/wayland-sessions/phosh.desktop
+test -x /usr/bin/phosh-session
+
+# Fail the build rather than silently creating duplicate YAML keys.
+if grep -Eq '^[[:space:]]*defaultDesktopEnvironment[[:space:]]*:' "$config"; then
+    echo "Calamares already has a defaultDesktopEnvironment; check $config" >&2
+    exit 1
+fi
+
+cat >> "$config" <<'TTABLET_CALAMARES_DESKTOP'
+
+# TTablet default session for newly installed accounts.
+defaultDesktopEnvironment:
+  executable: "/usr/bin/phosh-session"
+  desktopFile: "phosh"
+TTABLET_CALAMARES_DESKTOP
+
+grep -Eq '^defaultDesktopEnvironment:' "$config"

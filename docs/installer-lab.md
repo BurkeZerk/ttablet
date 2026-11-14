@@ -75,3 +75,25 @@ If that works, build the latest 0.4 branch and test a **new installation** in a 
 ### Acceptance test
 
 With a fresh installation and a new account, confirm the initial login and a subsequent reboot both select Phosh automatically. If GNOME is still chosen, inspect `/var/lib/AccountsService/users/<username>` and `/etc/gdm3/daemon.conf` on the installed system before further changes. Keep 0.4 as draft until verified.
+
+## Calamares GNOME preference override
+
+**Investigation (2026-11-13):** A new manually created account launched Phosh when `FallbackSession=phosh` was set, but an account created by Calamares still launched GNOME. In Calamares' upstream GDM integration, enabling autologin writes an explicit AccountsService `XSession=` preference for the chosen desktop. Without `defaultDesktopEnvironment`, Calamares searches for installed desktops and discovers GNOME earlier than Phosh.
+
+TTablet now sets `defaultDesktopEnvironment` to `phosh` with executable `/usr/bin/phosh-session` in `/etc/calamares/modules/displaymanager.conf` during the ISO build. The build hook fails if an active `defaultDesktopEnvironment` already exists, to avoid silently duplicating YAML keys. GDM's `FallbackSession=phosh` remains in place for users without an explicit preference.
+
+On the LIVE ISO, before running Calamares:
+
+    grep -A3 '^defaultDesktopEnvironment:' /etc/calamares/modules/displaymanager.conf
+    ls /usr/share/wayland-sessions/phosh.desktop
+    test -x /usr/bin/phosh-session && echo "Phosh executable exists"
+
+After a **fresh VM installation**, inspect the new account:
+
+    sudo cat "/var/lib/AccountsService/users/$(whoami)"
+    grep -E 'AutomaticLogin|FallbackSession' /etc/gdm3/daemon.conf
+    echo "$XDG_CURRENT_DESKTOP"
+
+Verify that fresh first login and a subsequent reboot both use Phosh without manual intervention. Test both installer modes (autologin enabled and disabled) before calling this fixed. Old installations may retain `XSession=gnome` and require a deliberate per-user change.
+
+**Until testing, treat this as a candidate fix.**
