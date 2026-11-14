@@ -127,3 +127,10 @@ On the actual Surface Pro 7, `intel_gpu_top` showed:
 The Video engine responding directly to playback is strong evidence that Firefox is using Intel's hardware video decoder. Render/3D activity also responds to rendering and UI updates, so its percentage cannot be interpreted as GPU wattage or a direct fault. No need to force graphics-driver changes without an identified regression.
 
 **Next experiment:** A/B battery draw with the existing `power-profiles-daemon` Balanced and Power Saver profiles. Keep brightness, video or browser workload, Wi-Fi and duration identical; record battery energy-based average over 10–15 minutes after a short settling period. Collect responsiveness/scrolling impressions as well as energy and restore Balanced after testing. Do not simultaneously change codec or other services.
+
+
+### Power Saver first measurement (Surface live USB)
+
+A 10-minute battery energy test with the existing `power-profiles-daemon` set to `power-saver` reported **13.62 W average**. The preceding **14.28 W** measurement was taken with AV1 disabled during *YouTube plus Reddit browsing*, so the apparent 0.66 W difference is **not a controlled A/B comparison** and must not be claimed as a proven power saving.
+
+Next: switch back to `balanced`, play the **same VP9 video** at the **same resolution and brightness**, avoid scrolling or other activity for the same ten-minute interval, and calculate average power from `BAT1/energy_now`. Compare responsiveness and playback smoothness as well. Repeat measurements if results are close. No permanent change to default profile yet.
