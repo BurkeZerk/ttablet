@@ -76,3 +76,58 @@ jobs:
             fi
           done
           echo "Exclusion checks passed"
+
+  calamares-password-policy:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test password policy against Debian's packaged users.conf
+        run: |
+          set -eu
+          apt-get update
+          apt-get install -y --no-install-recommends python3-yaml
+          hook="$PWD/config/hooks/live/050-calamares-password-policy.hook.chroot"
+          temp_dir=$(mktemp -d)
+          trap 'rm -rf "$temp_dir"' EXIT
+          cd "$temp_dir"
+          apt-get download calamares-settings-debian
+          dpkg-deb -x calamares-settings-debian_*.deb debian-config
+
+          original=debian-config/etc/calamares/modules/users.conf
+          cp "$original" users.conf
+          sh "$hook" users.conf
+          python3 - "$original" <<'PY'
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          before = yaml.safe_load(Path(sys.argv[1]).read_text())
+          after = yaml.safe_load(Path("users.conf").read_text())
+          before.update(
+              passwordRequirements={"minLength": 4},
+              allowWeakPasswords=False,
+              allowWeakPasswordsDefault=False,
+          )
+          assert after == before, after
+          assert type(after["passwordRequirements"]["minLength"]) is int
+          assert after["allowWeakPasswords"] is False
+          assert after["allowWeakPasswordsDefault"] is False
+          PY
+
+          cp users.conf expected.conf
+          sh "$hook" users.conf
+          cmp expected.conf users.conf
+
+          sed '/^allowWeakPasswords\(Default\)\{0,1\}:/s/false/true/' expected.conf > users.conf
+          sh "$hook" users.conf
+          cmp expected.conf users.conf
+
+          printf 'passwordRequirements: {minLength: 8}\n' > unexpected.conf
+          cp unexpected.conf original.conf
+          if sh "$hook" unexpected.conf; then
+            echo "ERROR: unexpected policy layout passed the build hook" >&2
+            exit 1
+          fi
+          cmp original.conf unexpected.conf
