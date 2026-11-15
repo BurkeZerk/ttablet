@@ -26,3 +26,7 @@ xdg-desktop-portal-gtk
 
 # Retain tested Balanced/Power Saver controls even without recommends
 power-profiles-daemon
+
+# GDM fallback for environments without working Wayland
+gnome-session-xsession
+xserver-xorg
