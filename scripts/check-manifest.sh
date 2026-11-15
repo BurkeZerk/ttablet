@@ -16,6 +16,7 @@ required=(
   iptsd
   calamares-settings-debian
   dosfstools
+  squashfs-tools
   intel-media-va-driver
   vainfo
   intel-gpu-tools

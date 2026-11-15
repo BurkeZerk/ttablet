@@ -2,3 +2,5 @@
 calamares-settings-debian
 # Calamares calls mkfs.fat to format the EFI System Partition.
 dosfstools
+# Calamares requires unsquashfs when the live filesystem is SquashFS.
+squashfs-tools
