@@ -15,6 +15,7 @@ required=(
   phosh-tablet
   iptsd
   calamares-settings-debian
+  dosfstools
   intel-media-va-driver
   vainfo
   intel-gpu-tools

@@ -36,16 +36,19 @@ jobs:
           phosh-tablet 1.0
           iptsd 1.0
           calamares-settings-debian 1.0
+          dosfstools 4.2
           intel-media-va-driver:amd64 25.2.3+dfsg1-1
           vainfo 2.0
           intel-gpu-tools 2.0
           MANIFEST
           bash scripts/check-manifest.sh "$positive"
-          sed '/^intel-media-va-driver:/d' "$positive" > "$negative"
-          if bash scripts/check-manifest.sh "$negative"; then
-            echo "ERROR: missing package was not detected" >&2
-            exit 1
-          fi
+          for package in intel-media-va-driver dosfstools; do
+            sed "/^$package[:[:space:]]/d" "$positive" > "$negative"
+            if bash scripts/check-manifest.sh "$negative"; then
+              echo "ERROR: missing $package was not detected" >&2
+              exit 1
+            fi
+          done
           echo "Manifest positive and negative checks passed"
       - name: Validate Firefox media defaults
         run: |
