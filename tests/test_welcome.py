@@ -43,9 +43,6 @@ class WelcomeTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     w.load_catalog(path)
 
-if __name__ == '__main__':
-    unittest.main()
-
 class TransactionTests(unittest.TestCase):
     def test_partial_failure_retry_and_empty_selection(self):
         import threading
@@ -87,3 +84,7 @@ class TransactionTests(unittest.TestCase):
         with patch.object(w, 'installed_scope', return_value=None), patch.object(w.subprocess, 'Popen', return_value=process):
             self.assertEqual(w.install_selected([{'id': 'org.test.App'}], event, lambda _: None, changed), -15)
             process.terminate.assert_called_once()
+
+
+if __name__ == '__main__':
+    unittest.main()
