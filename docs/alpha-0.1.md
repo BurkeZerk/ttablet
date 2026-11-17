@@ -10,7 +10,7 @@ From a clean checkout of the desired Alpha commit, run:
 
 ```sh
 ./scripts/build.sh
-(cd dist && sha256sum -c ttablet-0.1-alpha-surface-amd64.iso.sha256)
+(cd dist && sha256sum -c ttablet-0.1.0-alpha.1-surface-amd64.iso.sha256)
 ```
 
 The build uses a Git snapshot, an ephemeral rootless Debian container with nested mounts enabled, and a fresh workspace. It leaves a hybrid ISO, checksum, package manifest, provenance and build log in `dist/`. Failure keeps the workspace inside `.build/` for diagnosis. Set `TTABLET_KEEP_WORKDIR=1` to keep a successful workspace for inspecting the generated ISO tree.
@@ -23,7 +23,7 @@ If a fresh build cannot mount `/sys` during live-build, verify Podman's rootless
 
 ```sh
 # Set this to the label for the image being checked.
-export TTABLET_VERSION=0.1-alpha
+export TTABLET_VERSION=0.1.0-alpha.1
 export TTABLET_UEFI_LAB_DIR="$PWD/.build/alpha-uefi"
 ./scripts/uefi-lab.sh init
 TTABLET_UEFI_OFFLINE=1 ./scripts/uefi-lab.sh live
@@ -35,15 +35,15 @@ Use the standard TTablet live boot entry. Confirm that Phosh opens with the Quie
 TTABLET_UEFI_OFFLINE=1 ./scripts/uefi-lab.sh installed
 ```
 
-Sign in, check Optional Apps, then exercise lock and unlock. Verify that Flathub is listed with `flatpak remotes --system --show-details`. Open TTablet App Store, try initial setup offline, acknowledge the error and return to Phosh. If the session lacks the app store icon, search for **TTablet App Store** by name.
+Sign in, check TTablet Welcome, then exercise lock and unlock. Verify that Flathub is listed with `flatpak remotes --system --show-details`. Open TTablet App Store, try initial setup offline, acknowledge the error and return to Phosh. If the session lacks the app store icon, search for **TTablet App Store** by name.
 
-Shut down and start the installed guest with networking using `./scripts/uefi-lab.sh installed`. Verify that Optional Apps reopens from the app grid, offers only apps that are absent, and installs the selected apps. The first-run prompt is limited to installed Phosh accounts. Skip or successful setup records completion under `${XDG_STATE_HOME:-$HOME/.local/state}/ttablet/`.
+Shut down and start the installed guest with networking using `./scripts/uefi-lab.sh installed`. Verify that TTablet Welcome reopens from the app grid, offers only apps that are absent, and installs the selected apps. The first-run prompt is limited to installed Phosh accounts. Closing or skipping Welcome records completion under `${XDG_STATE_HOME:-$HOME/.local/state}/ttablet/`.
 
-Open TTablet App Store, confirm the Bazaar download, then launch the store again. The first download includes a shared Flatpak runtime. Closing the setup Console interrupts a download. Open the store again to retry. In Bazaar, search, install, launch and remove a small app. Log out and back in if a newly exported Flatpak launcher is missing from the app grid. Check file picking in a sandboxed app.
+Open TTablet App Store, confirm the Bazaar download, then launch the store again. The first download includes a shared Flatpak runtime. Use Cancel setup to interrupt a download; completed apps are retained. Open the store again to retry. In Bazaar, search, install, launch and remove a small app. Log out and back in if a newly exported Flatpak launcher is missing from the app grid. Check file picking in a sandboxed app.
 
 ## Native updates and recovery
 
-Use Console in the installed system to review Debian updates and firmware availability:
+Open **System Updates** from the grid to refresh and apply Debian/security and Linux-Surface updates. This native GNOME Software view remains independent of Bazaar and Welcome. Check its offline state, reconnect, retry, and reboot after applying an update. Use Console for additional diagnostics and firmware enumeration:
 
 ```sh
 sudo apt update
