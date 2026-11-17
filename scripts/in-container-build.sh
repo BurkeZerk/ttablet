@@ -51,9 +51,12 @@ cp -- "$manifest" "/dist/${TTABLET_STEM}.packages.txt"
 
 cd /dist
 sha256sum "${TTABLET_STEM}.iso" > "${TTABLET_STEM}.iso.sha256"
-chown "${HOST_UID}:${HOST_GID}" \
-  "${TTABLET_STEM}.iso" \
-  "${TTABLET_STEM}.packages.txt" \
-  "${TTABLET_STEM}.iso.sha256"
-printf 'Verified base and 0.5 diagnostic packages in ISO manifest\n'
+{
+  printf 'source_commit=%s\n' "$TTABLET_SOURCE_COMMIT"
+  printf 'builder_image_id=%s\n' "$TTABLET_BUILDER_IMAGE_ID"
+  printf 'builder_image_digest=%s\n' "$TTABLET_BUILDER_IMAGE_DIGEST"
+  printf 'finished_utc=%s\n' "$(date -u +%FT%TZ)"
+  printf 'archive_state=mutable Debian Trixie and Linux-Surface mirrors\n'
+  dpkg-query -W live-build debootstrap
+} > "${TTABLET_STEM}.provenance.txt"
 printf 'ISO: /dist/%s.iso\n' "$TTABLET_STEM"

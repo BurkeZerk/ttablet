@@ -8,7 +8,7 @@ VARS="$LAB/OVMF_VARS.4m.fd"
 OVMF_DIR="/usr/share/edk2/x64"
 CODE="$OVMF_DIR/OVMF_CODE.4m.fd"
 VARS_TEMPLATE="$OVMF_DIR/OVMF_VARS.4m.fd"
-VERSION="${TTABLET_VERSION:-0.6.0-dev}"
+VERSION="${TTABLET_VERSION:-0.1-alpha}"
 ISO="${TTABLET_UEFI_ISO:-$ROOT/dist/ttablet-$VERSION-surface-amd64.iso}"
 
 usage() {

@@ -1,5 +1,5 @@
 # Intentional TTablet tablet essentials with --apt-recommends false.
-# Keep touch-first settings, installing/updating software, and connectivity.
+# Keep touch-first settings, firmware updates, and connectivity.
 # Debian Live's crucial user-setup/sudo are explicit in 10-tablet.list.chroot.
 #
 # Phosh's own hard dependencies remain installed via phosh-tablet.
@@ -15,11 +15,9 @@ bluez
 wpasupplicant
 wireless-regdb
 
-# Secure privilege dialogs and graphical application/firmware updating
+# Secure privilege dialogs and native firmware updates
 polkitd
-gnome-software
-gnome-software-plugin-deb
-gnome-software-plugin-fwupd
+fwupd
 
 # File browsing and removable drives
 nautilus
@@ -35,6 +33,6 @@ power-profiles-daemon
 gnome-session-xsession
 xserver-xorg
 
-# TTablet 0.6: Flatpak first for optional user applications.
-# Keep GNOME Software for Debian and firmware updates until a replacement UI passes testing.
+# Bazaar setup uses a graphical confirmation and Console for download progress.
 flatpak
+zenity

@@ -3,6 +3,8 @@
 lb config noauto \
   --distribution trixie \
   --architectures amd64 \
+  --iso-application "TTablet 0.1 Alpha" \
+  --iso-volume "TTablet 0.1 Alpha" \
   --binary-images iso-hybrid \
   --debian-installer none \
   --archive-areas "main contrib non-free non-free-firmware" \

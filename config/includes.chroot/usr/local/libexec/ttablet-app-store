@@ -12,15 +12,26 @@ if flatpak info --user "$app" >/dev/null 2>&1; then
 fi
 
 if [ "${1:-}" != --install ]; then
-    exec kgx -e "$0 --install"
+    if zenity --question --title='TTablet App Store' \
+        --text='Install Bazaar and its shared runtime from Flathub? A network connection is required.' \
+        --ok-label=Install --cancel-label=Cancel --default-cancel; then
+        exec kgx -e "$0 --install"
+    fi
+    exit 0
 fi
 
-printf '%s\n' 'Install Bazaar from Flathub to open the TTablet App Store.' \
-    'Connect to the internet first. The first download includes a shared runtime.'
-if flatpak install --system flathub "$app" && flatpak info --system "$app" >/dev/null 2>&1; then
+# Serialize setup for this session to avoid parallel Flatpak transactions from
+# repeated taps. The lock is released before Bazaar launches.
+exec 9>"${XDG_RUNTIME_DIR:?}/ttablet-bazaar.lock"
+if ! flock -n 9; then
+    exit 0
+fi
+
+if flatpak info --system "$app" >/dev/null 2>&1 ||
+    flatpak install --system --noninteractive flathub "$app"; then
+    exec 9>&-
     exec flatpak run --system "$app"
 fi
 
-printf '\n%s\n' 'Bazaar setup did not finish. Check your connection and reopen TTablet App Store to retry.'
-printf '%s' 'Press Enter or close this window. '
-read -r unused || :
+zenity --error --title='TTablet App Store' \
+    --text='Bazaar setup did not finish. Check your connection and reopen TTablet App Store to retry.' || :
