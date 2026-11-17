@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+# Live Build runs binary hooks after menu generation and before checksums.
+for config in boot/grub/grub.cfg isolinux/live.cfg; do
+    grep -Fq 'Live system (surface)' "$config"
+    sed -i 's/Live system (surface/TTablet 0.1 Alpha (surface/g' "$config"
+done

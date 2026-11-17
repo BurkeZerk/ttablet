@@ -43,7 +43,7 @@ case "${1:-help}" in
       echo 'UEFI lab not initialized. Run ./scripts/uefi-lab.sh init.' >&2; exit 1;
     }
     args=(
-      -machine q35,accel=kvm -cpu host -m 4096 -smp 4 -vga virtio
+      -machine q35,accel=kvm:tcg -m 4096 -smp 4 -vga virtio
       -drive "if=pflash,format=raw,unit=0,readonly=on,file=$CODE"
       -drive "if=pflash,format=raw,unit=1,file=$VARS"
       -drive "if=virtio,format=qcow2,file=$DISK"

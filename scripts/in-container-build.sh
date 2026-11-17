@@ -19,7 +19,7 @@ if [[ -d /src/config/hooks ]]; then
     relative="${f#/src/}"
     mkdir -p "/work/$(dirname "$relative")"
     cp -a "$f" "/work/$relative"
-  done < <(find /src/config/hooks -type f -name '*.hook.chroot' -print0)
+  done < <(find /src/config/hooks -type f \( -name '*.hook.chroot' -o -name '*.hook.binary' \) -print0)
 fi
 
 # Install exactly the same diagnostic script we keep under version control.

@@ -22,7 +22,7 @@ jobs:
         run: |
           set -e
           sh -n auto/config
-          for file in config/hooks/live/*.hook.chroot; do
+          for file in config/hooks/live/*.hook.*; do
             sh -n "$file"
           done
           for file in config/includes.chroot/usr/local/libexec/ttablet-*; do
@@ -207,5 +207,6 @@ jobs:
           expected="'file:///usr/share/backgrounds/ttablet/ttablet.svg'"
           test "$(gsettings get org.gnome.desktop.background picture-uri)" = "$expected"
           test "$(gsettings get org.gnome.desktop.background picture-uri-dark)" = "$expected"
-          desktop-file-validate config/includes.chroot/usr/share/applications/ttablet-*.desktop
+          desktop-file-validate config/includes.chroot/usr/share/applications/ttablet-*.desktop \
+            config/includes.chroot/etc/xdg/autostart/ttablet-optional-apps.desktop
           echo "TTablet wallpaper defaults and launchers validated"
