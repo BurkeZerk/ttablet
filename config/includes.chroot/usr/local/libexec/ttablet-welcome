@@ -209,7 +209,7 @@ def main():
             else:
                 self.status.set_text('Apps are ready in the app grid. You can close Welcome.')
                 if store:
-                    subprocess.Popen(['flatpak', 'run', '--system', BAZAAR])
+                    subprocess.Popen(['flatpak', 'run', '--' + (installed_scope(BAZAAR) or 'system'), BAZAAR])
                     Gtk.main_quit()
 
     window = Welcome()
