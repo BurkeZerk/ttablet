@@ -15,7 +15,10 @@ required=(
   phosh-tablet
   flatpak
   gnome-console
-  zenity
+  gnome-software
+  gnome-software-plugin-deb
+  gnome-software-plugin-fwupd
+  packagekit
   fwupd
   xdg-desktop-portal-gtk
   iptsd
@@ -48,4 +51,4 @@ for package in "${required[@]}"; do
   fi
 done
 
-echo "Verified base, lean installer and Alpha app and update packages in ISO manifest"
+echo "Verified base, lean installer and 0.6 app and update packages in ISO manifest"

@@ -58,5 +58,12 @@ sha256sum "${TTABLET_STEM}.iso" > "${TTABLET_STEM}.iso.sha256"
   printf 'finished_utc=%s\n' "$(date -u +%FT%TZ)"
   printf 'archive_state=mutable Debian Trixie and Linux-Surface mirrors\n'
   dpkg-query -W live-build debootstrap
+  printf '\nConfigured image sources and signing inputs:\n'
+  find /work/chroot/etc/apt -type f \( -name '*.list' -o -name '*.sources' \) -exec cat {} \;
+  sha256sum /src/config/archives/*.key.* /src/config/includes.chroot/usr/share/flatpak/remotes.d/flathub.flatpakrepo
+  printf 'bundled_flatpak_refs=none (on-demand setup)\n'
+  printf 'iso_bytes=%s\n' "$(stat -c %s "${TTABLET_STEM}.iso")"
+  printf 'package_count=%s\n' "$(wc -l < "${TTABLET_STEM}.packages.txt")"
+  chroot /work/chroot dpkg-query -W -f='${Package} ${Installed-Size}\n' | awk '{total += $2} END {printf "native_installed_kib=%d\n", total}' 
 } > "${TTABLET_STEM}.provenance.txt"
 printf 'ISO: /dist/%s.iso\n' "$TTABLET_STEM"

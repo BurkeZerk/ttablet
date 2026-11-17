@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
-Name=Optional Apps
-Comment=Choose extra apps to install from Flathub
+Name=TTablet Welcome
+Comment=Get connected and choose optional apps
 Exec=/usr/local/libexec/ttablet-optional-apps
 Icon=system-software-install
 Terminal=false
 Categories=GTK;Settings;PackageManager;
-Keywords=Setup;Calculator;Weather;Clocks;Flathub;
+Keywords=Welcome;Setup;Apps;Flathub;
 X-Purism-FormFactor=Workstation;Mobile;

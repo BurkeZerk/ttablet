@@ -36,3 +36,12 @@ xserver-xorg
 # Bazaar setup uses a graphical confirmation and Console for download progress.
 flatpak
 zenity
+
+# Native updates remain independent of the Flatpak app store.
+gnome-software
+packagekit
+# Welcome uses GTK already present in the desktop, without another runtime.
+python3-gi
+gir1.2-gtk-3.0
+gnome-software-plugin-deb
+gnome-software-plugin-fwupd

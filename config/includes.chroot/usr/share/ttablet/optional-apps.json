@@ -1,0 +1,5 @@
+{"version":1,"apps":[
+{"id":"org.gnome.Papers","label":"Document Viewer","description":"Read PDF and reference documents"},
+{"id":"org.gnome.Decibels","label":"Audio Player","description":"Listen to audio files"},
+{"id":"org.gnome.TextEditor","label":"Text Editor","description":"Write notes and edit text files"}
+]}

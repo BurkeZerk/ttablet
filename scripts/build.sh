@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${TTABLET_VERSION:-0.1-alpha}"
+VERSION="${TTABLET_VERSION:-0.1.0-alpha.1}"
 IMAGE="${TTABLET_CONTAINER_IMAGE:-docker.io/library/debian:trixie}"
 
 if [[ ! "$VERSION" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ ]]; then

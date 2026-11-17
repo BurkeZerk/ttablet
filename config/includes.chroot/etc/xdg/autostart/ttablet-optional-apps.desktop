@@ -1,5 +1,5 @@
 [Desktop Entry]
 Type=Application
-Name=TTablet Optional Apps
+Name=TTablet Welcome
 Exec=/usr/local/libexec/ttablet-optional-apps --first-run
 Terminal=false

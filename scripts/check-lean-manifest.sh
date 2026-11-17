@@ -9,7 +9,7 @@ if (( $# != 1 )) || [[ ! -s "${1:-}" ]]; then
 fi
 
 manifest="$1"
-unwanted=(malcontent-gui phosh-tour gnome-tour gnome-software)
+unwanted=(malcontent-gui phosh-tour gnome-tour)
 fail=0
 
 for package in "${unwanted[@]}"; do
@@ -17,7 +17,7 @@ for package in "${unwanted[@]}"; do
     {
       name = $1
       sub(/:[[:alnum:]_-]+$/, "", name)
-      if (name == expected || (expected == "gnome-software" && index(name, "gnome-software-") == 1)) { found=1; exit }
+      if (name == expected) { found=1; exit }
     }
     END { exit(found ? 0 : 1) }
   ' "$manifest"; then
@@ -31,4 +31,4 @@ if (( fail )); then
   exit 1
 fi
 
-echo "Verified lean image omits GNOME Software, Parental Controls and Tour applications"
+echo "Verified lean image omits Parental Controls and Phone/GNOME Tour applications"
