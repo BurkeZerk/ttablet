@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+# Ship Flathub's official signed remote descriptor *in the image*. The live
+# installer and first boot must not depend on a network connection. This
+# download runs at ISO BUILD time, not during login or on the installed tablet.
+# Static remotes in /usr/share/flatpak/remotes.d/ are supported by Flatpak.
+command -v flatpak >/dev/null
+command -v curl >/dev/null
+install -d -m 0755 /usr/share/flatpak/remotes.d
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT HUP INT TERM
+curl --fail --silent --show-error --location --retry 3 --connect-timeout 20 \
+  --max-time 120 'https://dl.flathub.org/repo/flathub.flatpakrepo' -o "$tmp"
+test -s "$tmp"
+grep -q '^\[Flatpak Repo\]' "$tmp"
+grep -q '^GPGKey=' "$tmp"
+grep -q '^Url=https://dl.flathub.org/repo/' "$tmp"
+install -m 0644 "$tmp" /usr/share/flatpak/remotes.d/flathub.flatpakrepo

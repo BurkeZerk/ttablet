@@ -13,6 +13,7 @@ manifest="$1"
 required=(
   linux-image-surface
   phosh-tablet
+  flatpak
   iptsd
   wpasupplicant
   wireless-regdb
@@ -43,4 +44,4 @@ for package in "${required[@]}"; do
   fi
 done
 
-echo "Verified base and 0.5 diagnostic packages in ISO manifest"
+echo "Verified base, lean installer and 0.6 Flatpak packages in ISO manifest"

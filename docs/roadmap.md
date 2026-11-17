@@ -10,6 +10,10 @@
 
 These are **stacked PRs**: merge #5 into the 0.5 branch, then #4 into `main` **only after deliberate integration/release approval**. Do not force-push, delete the known-working baseline, or imply `main` already contains the Surface-installed build. Preserve the exact tested ISO/checksum when available.
 
+## 0.6 milestone — Application Experience
+
+**Active planning tracker:** [Issue #10](https://github.com/BurkeZerk/ttablet/issues/10). **Stage A implementation:** [0.6 Application Experience](application-experience-0.6.md) on a branch from the tested lean build. It begins Flatpak/Flathub integration and adds an original, overridable TTablet wallpaper. Bazaar's offline-available packaging remains a separate Stage B acceptance target; GNOME Software continues to handle native updates until replaced with a tested alternative.
+
 ## Phase 1: everyday tablet UX audit (next)
 
 Choose a few real tasks and note friction, not just whether a program starts. Focus on **touch-only use without a physical keyboard**.

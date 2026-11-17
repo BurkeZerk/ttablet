@@ -34,3 +34,7 @@ power-profiles-daemon
 # GDM fallback for environments without working Wayland
 gnome-session-xsession
 xserver-xorg
+
+# TTablet 0.6: Flatpak first for optional user applications.
+# Keep GNOME Software for Debian and firmware updates until a replacement UI passes testing.
+flatpak

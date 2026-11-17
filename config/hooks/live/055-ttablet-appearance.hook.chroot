@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+# Make the new GNOME background defaults visible in the live ISO and installed
+# Calamares copies. Never write per-user dconf state; users may change wallpaper.
+test -s /usr/share/backgrounds/ttablet/ttablet.svg
+test -s /usr/share/glib-2.0/schemas/99_ttablet.gschema.override
+command -v glib-compile-schemas >/dev/null
+glib-compile-schemas --strict /usr/share/glib-2.0/schemas

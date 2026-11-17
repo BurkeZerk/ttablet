@@ -34,6 +34,7 @@ jobs:
           cat > "$positive" <<'MANIFEST'
           linux-image-surface 1.0
           phosh-tablet 1.0
+          flatpak:amd64 1.16
           iptsd 1.0
           wpasupplicant:amd64 2:2.10-24
           wireless-regdb 1.0
@@ -50,7 +51,7 @@ jobs:
           intel-gpu-tools 2.0
           MANIFEST
           bash scripts/check-manifest.sh "$positive"
-          for package in wpasupplicant wireless-regdb grub-efi grub-efi-amd64 \
+          for package in flatpak wpasupplicant wireless-regdb grub-efi grub-efi-amd64 \
               grub-efi-amd64-bin grub2-common efibootmgr intel-media-va-driver \
               dosfstools squashfs-tools; do
             sed "/^$package[:[:space:]]/d" "$positive" > "$negative"
@@ -164,3 +165,37 @@ jobs:
             exit 1
           fi
           cmp original.conf unexpected.conf
+
+  ttablet-appearance:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate TTablet wallpaper, defaults, and hook
+        run: |
+          set -eu
+          apt-get update
+          apt-get install -y --no-install-recommends libglib2.0-bin gsettings-desktop-schemas python3
+          override=config/includes.chroot/usr/share/glib-2.0/schemas/99_ttablet.gschema.override
+          wallpaper=config/includes.chroot/usr/share/backgrounds/ttablet/ttablet.svg
+          test -s "$override"
+          test -s "$wallpaper"
+          python3 - "$wallpaper" "$override" <<'PY'
+          import configparser
+          from pathlib import Path
+          from xml.etree import ElementTree
+          import sys
+          ElementTree.parse(sys.argv[1])
+          parser = configparser.ConfigParser()
+          parser.read(sys.argv[2])
+          section = parser["org.gnome.desktop.background"]
+          expected = "'file:///usr/share/backgrounds/ttablet/ttablet.svg'"
+          assert section["picture-uri"] == expected
+          assert section["picture-uri-dark"] == expected
+          assert section["picture-options"] == "'zoom'"
+          PY
+          cp "$override" /usr/share/glib-2.0/schemas/
+          glib-compile-schemas --strict /usr/share/glib-2.0/schemas
+          sh -n config/hooks/live/055-ttablet-appearance.hook.chroot
+          sh -n config/hooks/live/060-flathub-remote.hook.chroot
+          echo "TTablet appearance defaults validated"

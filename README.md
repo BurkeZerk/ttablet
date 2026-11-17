@@ -6,7 +6,7 @@ A small, experimental Debian-based Linux tablet distribution for Microsoft Surfa
 
 **Branches:** `main` currently contains the earlier 0.4 milestone; [PR #4](https://github.com/BurkeZerk/ttablet/pull/4) contains 0.5 performance/diagnostics work; [PR #5](https://github.com/BurkeZerk/ttablet/pull/5) is stacked on #4 and contains the lean build plus Calamares/boot/network fixes. Both PRs remain draft pending intentional integration. New development should build from `experiment/0.5-lean-recommends` until the branches are reconciled.
 
-See the [installed Surface baseline](docs/installed-surface-baseline.md) and [development roadmap](docs/roadmap.md).
+See the [installed Surface baseline](docs/installed-surface-baseline.md) and [development roadmap](docs/roadmap.md). The next [0.6 Application Experience milestone](docs/application-experience-0.6.md) is in a **separate, unmerged candidate branch**; it does not change the currently installed Surface.
 
 ## Quick start on CachyOS
 
