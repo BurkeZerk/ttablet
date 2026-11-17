@@ -37,6 +37,32 @@ def load_catalog(path=CATALOG):
     return apps
 
 
+def install_selected(selected, cancelled, report, process_changed):
+    """Install only explicit IDs, preserving completed work on retry/cancel."""
+    for app in selected:
+        if cancelled.is_set():
+            return 130
+        if installed_scope(app['id']):
+            continue
+        process = subprocess.Popen(['flatpak', 'install', '--system', '--app', '--assumeyes',
+                                    '--noninteractive', 'flathub', app['id']],
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                   text=True, start_new_session=True)
+        process_changed(process)
+        try:
+            if cancelled.is_set():
+                process.terminate()
+            for line in process.stdout:
+                report(line.strip()[-500:])
+            code = process.wait()
+        finally:
+            process.stdout.close()
+            process_changed(None)
+        if code:
+            return code
+    return 130 if cancelled.is_set() else 0
+
+
 def main():
     if '--first-run' in sys.argv and not first_run_allowed(
             Path('/proc/cmdline').read_text(), os.environ.get('XDG_CURRENT_DESKTOP', ''), STATE.exists()):
@@ -161,25 +187,10 @@ def main():
             threading.Thread(target=self.worker, args=(selected,), daemon=True).start()
 
         def worker(self, selected):
-            code = 0
             try:
-                for app in selected:
-                    if self.cancelled.is_set():
-                        break
-                    if installed_scope(app['id']):
-                        continue
-                    self.process = subprocess.Popen(['flatpak', 'install', '--system', '--app', '--assumeyes',
-                                                     '--noninteractive', 'flathub', app['id']],
-                                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                                    text=True, start_new_session=True)
-                    if self.cancelled.is_set():
-                        self.process.terminate()
-                    for line in self.process.stdout:
-                        GLib.idle_add(self.status.set_text, line.strip()[-500:])
-                    code = self.process.wait()
-                    self.process = None
-                    if code:
-                        break
+                code = install_selected(selected, self.cancelled,
+                                        lambda text: GLib.idle_add(self.status.set_text, text),
+                                        lambda process: setattr(self, 'process', process))
             except OSError as error:
                 code = 1
                 GLib.idle_add(self.status.set_text, str(error))

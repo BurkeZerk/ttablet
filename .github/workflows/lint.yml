@@ -213,5 +213,5 @@ jobs:
           expected="'file:///usr/share/backgrounds/ttablet/ttablet.svg'"
           test "$(gsettings get org.gnome.desktop.background picture-uri)" = "$expected"
           test "$(gsettings get org.gnome.desktop.background picture-uri-dark)" = "$expected"
-          desktop-file-validate config/includes.chroot/usr/share/applications/ttablet-*.desktop
+          desktop-file-validate config/includes.chroot/usr/share/applications/*.desktop
           echo "TTablet wallpaper defaults and launchers validated"
