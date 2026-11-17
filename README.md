@@ -2,13 +2,15 @@
 
 A small, experimental Debian-based Linux tablet distribution for Microsoft Surface hardware, initially the Surface Pro 7.
 
-**Status (November 2026):** **TTablet 0.5 Lean is running from the internal SSD of a Surface Pro 7** following a reported successful Calamares installation. Built around the Linux-Surface kernel, Phosh and Debian 13 (Trixie). This is the first physical-hardware installation milestone, **not a stable release**. The installed-image hash/build commit has not been independently recorded; real-world testing remains limited to one device.
+The `alpha/0.1` branch develops **TTablet 0.1 Alpha**. See the [development specification](docs/development-spec-0.1.md) and the [Alpha build, test and recovery guide](docs/alpha-0.1.md). The existing Surface installation and older candidate branches are recorded below.
+
+**Installed baseline (November 2026):** **TTablet 0.5 Lean is running from the internal SSD of a Surface Pro 7** following a reported successful Calamares installation. Built around the Linux-Surface kernel, Phosh and Debian 13 (Trixie). This is the first physical-hardware installation milestone, **not a stable release**. The installed-image hash/build commit has not been independently recorded; real-world testing remains limited to one device.
 
 **Branches:** `main` currently contains the earlier 0.4 milestone; [PR #4](https://github.com/BurkeZerk/ttablet/pull/4) contains 0.5 performance/diagnostics work; [PR #5](https://github.com/BurkeZerk/ttablet/pull/5) is stacked on #4 and contains the lean build plus Calamares/boot/network fixes. Both PRs remain draft pending intentional integration. New development should build from `experiment/0.5-lean-recommends` until the branches are reconciled.
 
 See the [installed Surface baseline](docs/installed-surface-baseline.md) and [development roadmap](docs/roadmap.md). The next [0.6 Application Experience milestone](docs/application-experience-0.6.md) is in a **separate, unmerged candidate branch**; it does not change the currently installed Surface.
 
-## Quick start on CachyOS
+## Revisit the 0.5 Lean build on CachyOS
 
     sudo pacman -S --needed git podman qemu-desktop e2fsprogs
     git clone https://github.com/BurkeZerk/ttablet.git
