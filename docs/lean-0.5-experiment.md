@@ -1,6 +1,6 @@
 # TTablet 0.5 — Lean, just-works build experiment
 
-**Experimental branch only.** This is a follow-on to the TTablet 0.5 performance baseline, not a new default or a replacement for the known-working USB ISO.
+**Updated 2026-11-17:** The lean image has now been successfully installed on one physical Surface Pro 7 internal SSD, with working Phosh, touchscreen, Wi-Fi and responsive s2idle resume. **Still experimental**; [PR #5](https://github.com/BurkeZerk/ttablet/pull/5) remains draft. See [installed hardware baseline](installed-surface-baseline.md). The following build and testing instructions document how we reached this milestone; some checkpoints refer to the earlier untested candidate.
 
 ## Philosophy
 
@@ -79,11 +79,11 @@ Expected: **no output**. `libmalcontent-0-0` appearing is acceptable; it is a li
 - Kernel/module, display resolution, and GPU tuning
 - Release profile separation for QEMU and video-diagnostic tools
 
-Only adopt lean-build changes after functionality and manifest comparisons justify them. The previous tested TTablet 0.5 build remains our rollback.
+Real hardware now confirms the lean build can reach a usable installed Phosh session. Remaining software-update, broad app-compatibility and longer standby tests are tracked separately. Preserve a working recovery USB; don't treat the package reduction alone as proof of power savings.
 
-## Installed-Surface testing strategy (planned, not yet proven)
+## Historical installed-Surface testing strategy (original pre-install plan)
 
-TTablet's current 0.4 install milestone was tested in a **disposable UEFI virtual machine**; booting a live USB on the Surface does **not** mean its Calamares installation path is proven on the actual device.
+TTablet's 0.4 installer was originally tested in a **disposable UEFI virtual machine**. Subsequently, a 0.5 Lean build reached a successful physical-SSD installation on the Surface Pro 7. The steps below are retained as the original safety checklist for future clean installs; they do not imply the current hardware installation is untested.
 
 The preference is to perform **future performance measurements on an installed Surface**, which should eliminate some live USB and overlayfs startup overhead. The correct order is:
 1. Finish lean-image package comparison and basic QEMU live boot.
@@ -95,6 +95,12 @@ The preference is to perform **future performance measurements on an installed S
 7. Only after a stable install, collect a fresh installed-system baseline: time to *usable desktop*, idle power at fixed brightness, mixed browser/video draw, and background CPU/service activity. Compare against installed vs installed in subsequent experiments, not against a live USB as though they were equivalent.
 
 The physical install is **opt-in and higher risk**: it is not a routine acceptance step until backup and recovery have been prepared.
+
+### Final build caveat
+
+The initial lean-build manifest count was **1,095 packages**, compared with **1,561** in the previous full image—**before** necessary packages were added back for GDM X11 fallback, Wi-Fi, and offline UEFI installation. Do not use 1,095 as the final installed package count without measuring again.
+
+The first working installed hardware baseline was **3.90 W screen-on idle** versus **4.92 W** measured on the earlier full live USB at approximately comparable conditions. These are distinct environments, so do not attribute the full difference to removed packages alone.
 
 ## Single application manager direction
 

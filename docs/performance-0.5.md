@@ -1,6 +1,6 @@
 # TTablet 0.5 — Performance and battery baseline
 
-**Status:** ISO and QEMU smoke tests passed; Surface Pro 7 live USB hardware diagnostics collected; AV1-disabled Firefox default prepared for A/B testing.
+**Status updated 2026-11-17:** 0.5 Lean is now booting from a physical Surface Pro 7 internal SSD; see [installed Surface baseline](installed-surface-baseline.md). Earlier sections below are retained as the historical live USB testing protocol and results. Performance optimization is paused in favor of touch-first usability work. Long standby tests deferred to [GitHub issue #6](https://github.com/BurkeZerk/ttablet/issues/6).
 
 0.5 starts from the 0.4 UEFI/Phosh installer, without enabling untested power settings or removing working desktop dependencies. The goal is better battery efficiency and smooth browsing/video, not an arbitrary low RAM number.
 

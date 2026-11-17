@@ -1,6 +1,8 @@
 # TTablet 0.4 — UEFI installation laboratory
 
-This branch is an experimental **VM-only** Calamares installer candidate, not a tested installer for a real Surface. Debian uses Calamares in its official graphical live images. TTablet 0.4 includes calamares-settings-debian in the live OS.
+**Historical 0.4 installer laboratory:** This page documents the original **VM-only** Calamares prototype. **Later 0.5 Lean builds have been installed on a physical Surface Pro 7 internal SSD**, after adding missing Wi-Fi and UEFI packages. See [the installed Surface baseline](installed-surface-baseline.md) and [the lean build design](lean-0.5-experiment.md). The VM-only warnings below describe the status *when 0.4 was first developed*; do not use the old branch as the current installer.
+
+This branch was originally an experimental **VM-only** Calamares installer candidate, not a tested installer for a real Surface. Debian uses Calamares in its official graphical live images. TTablet 0.4 includes calamares-settings-debian in the live OS.
 
 **Do not install this prototype on a physical device containing data you care about.**
 
