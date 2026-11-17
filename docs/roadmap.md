@@ -12,7 +12,7 @@ These are **stacked PRs**: merge #5 into the 0.5 branch, then #4 into `main` **o
 
 ## 0.6 milestone — Application Experience
 
-**Active planning tracker:** [Issue #10](https://github.com/BurkeZerk/ttablet/issues/10). **Stage A implementation:** [0.6 Application Experience](application-experience-0.6.md) on a branch from the tested lean build. It begins Flatpak/Flathub integration and adds an original, overridable TTablet wallpaper. Bazaar's offline-available packaging remains a separate Stage B acceptance target; GNOME Software continues to handle native updates until replaced with a tested alternative.
+The [0.6 milestone](https://github.com/BurkeZerk/ttablet/milestone/1) and [tracker #10](https://github.com/BurkeZerk/ttablet/issues/10) cover the transition to Bazaar and touch-accessible native updates. The [first candidate](application-experience-0.6.md) adds an on-demand Bazaar launcher, a direct GNOME Software Updates launcher, and an overridable TTablet wallpaper. Bundling Bazaar for offline launch depends on size and installation tests.
 
 ## Phase 1: everyday tablet UX audit (next)
 
@@ -29,7 +29,7 @@ Choose a few real tasks and note friction, not just whether a program starts. Fo
 
 Record **observed problem → expected behavior → exact reproduction → severity → preferred minimal fix**. Prioritize issues that block ordinary touch-only tasks, not aesthetic polish. No need to run battery measurements between every change.
 
-## Phase 2: Bazaar as default app store (decision; not yet implemented)
+## Phase 2: Bazaar as default app store
 
 **UX finding:** GNOME Software successfully searched, downloaded and installed an APT application on the physical Surface with working on-screen keyboard and PIN authentication, but its interface was judged awkward and unattractive. A hands-on Bazaar trial was received positively; the chosen direction is **Flatpak-first** for optional user applications.
 

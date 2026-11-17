@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${TTABLET_VERSION:-0.5.0-dev}"
+VERSION="${TTABLET_VERSION:-0.6.0-dev}"
 ISO="${1:-$ROOT/dist/ttablet-${VERSION}-surface-amd64.iso}"
 PERSISTENCE="${2:-}"
 

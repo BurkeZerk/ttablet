@@ -1,68 +1,70 @@
-# TTablet 0.6 — Application Experience (Stage A)
+# TTablet 0.6 — Application Experience
 
-**Status:** Unmerged 0.6 candidate, based on the tested 0.5 Lean Surface SSD branch. [0.6 milestone tracker](https://github.com/BurkeZerk/ttablet/issues/10) · [Bazaar direction](https://github.com/BurkeZerk/ttablet/issues/7)
+The [first 0.6 candidate](https://github.com/BurkeZerk/ttablet/pull/12) builds on the [0.5 Lean Surface baseline](installed-surface-baseline.md). Progress is tracked in [milestone 1](https://github.com/BurkeZerk/ttablet/milestone/1) and [issue #10](https://github.com/BurkeZerk/ttablet/issues/10).
 
-## Guiding principle
+## Apps and updates
 
-**Debian runs the tablet; Flatpak runs ordinary user-installed apps; Bazaar will be the app store.** Preserve touch-accessible Debian/firmware updates separately. Do not replace working GNOME Software or PackageKit until a native Updates UI has passed acceptance testing.
+- **TTablet App Store** opens Bazaar. On a fresh image, it first opens Console and offers to install the official Bazaar Flatpak from Flathub. Flatpak displays and asks you to confirm the downloads. New installs use the system Flatpak installation so all local users can launch it. The launcher also opens an existing per-user Bazaar install. Once Bazaar is installed, its upstream launcher can also appear in Phosh.
+- The image includes Debian's Flatpak package, the GTK portal, and the [Flathub remote descriptor](https://dl.flathub.org/repo/flathub.flatpakrepo). The build fetches the descriptor over HTTPS and stages it in [Flatpak's supported system remote directory](https://manpages.debian.org/trixie/flatpak/flatpak-remote.5.en.html). It includes the key Flatpak uses to verify Flathub content. Bazaar and its GNOME runtime are downloaded only when requested. If the runtime is absent, expect several hundred megabytes of downloads.
+- **System Updates** opens GNOME Software directly to Updates. Its Debian PackageKit and fwupd plugins handle native system and firmware updates. The existing Software launcher is available during testing.
+- The dark teal **Quiet Orbit** wallpaper is the default in light and dark mode. User background preferences take precedence. The new launchers use existing system icons.
 
-## What Stage A actually changes
+## Build and test in a disposable VM
 
-- Adds Debian's `flatpak` package to the curated lean ISO package list.
-- Fetches Flathub's **official, signed `.flatpakrepo` remote descriptor at ISO build time** (HTTPS) into `/usr/share/flatpak/remotes.d/` so a new installed system discovers Flathub **without having to download the descriptor at first login**. This doesn't prefetch apps or runtimes; internet is still needed to install apps.
-- Adds an original **TTablet / Quiet Orbit** SVG wallpaper in `/usr/share/backgrounds/ttablet/`. GNOME's overridable background defaults select it in both light and dark styles, compiled in the live-build chroot hook.
-- Leaves the tested 0.5 kernel, GDM/Phosh/Squeekboard behavior, Calamares hooks, GNOME Software + Debian/firmware updater, sleep and power settings untouched.
+On a CachyOS build host with Podman, QEMU and OVMF installed, use a separate checkout or switch to the candidate branch in an existing clean checkout.
 
-**Bazaar itself is NOT YET preinstalled.** Its Flatpak runtime and application are not part of Stage A. This is an intentional stepwise introduction: complete the Flatpak plumbing and visible branding first, then evaluate reproducible offline-ready Bazaar bundling and ISO size in Stage B. Do not label Stage A 'Bazaar installed by default'.
-
-No arbitrary GNOME theme package removal, `/etc/os-release` spoofing, auto-app downloads or login-time installers.
-
-## Build on CachyOS
-
-```fish
-cd ~/ttablet
+```sh
 git fetch origin
 git switch --track origin/feature/0.6-application-experience
-set -gx TTABLET_VERSION 0.6.0-stage-a
 ./scripts/build.sh
+sha256sum dist/ttablet-0.6.0-dev-surface-amd64.iso
 ./scripts/test-qemu.sh
 ```
 
-Expected ISO path: `dist/ttablet-0.6.0-stage-a-surface-amd64.iso`. Keep the known-good 0.5 ISO as backup. The build will need network access to fetch Flathub remote metadata; **the installed OS / Calamares remains bootable and installable offline**.
+Confirm that the live session opens Phosh and that the wallpaper, Firefox, Files, Settings, Console and Squeekboard work. Then create a disposable UEFI SSD and test with the NIC absent from the start.
 
-## Acceptance tests
-
-On the live ISO in QEMU, inspect:
-
-```bash
-dpkg-query -W flatpak
-test -s /usr/share/flatpak/remotes.d/flathub.flatpakrepo && echo remote-present
-flatpak remotes --show-details
-gsettings get org.gnome.desktop.background picture-uri
-gsettings get org.gnome.desktop.background picture-uri-dark
+```sh
+TTABLET_UEFI_LAB_DIR="$PWD/.build/uefi-0.6" ./scripts/uefi-lab.sh init
+TTABLET_UEFI_OFFLINE=1 TTABLET_UEFI_LAB_DIR="$PWD/.build/uefi-0.6" ./scripts/uefi-lab.sh live
+TTABLET_UEFI_OFFLINE=1 TTABLET_UEFI_LAB_DIR="$PWD/.build/uefi-0.6" ./scripts/uefi-lab.sh installed
 ```
 
-Expected: Flatpak installed; Flathub listed as available remote; a `file:///usr/share/backgrounds/ttablet/ttablet.svg` default when there is no prior user override; background visibly distinct. If `flatpak remotes` doesn't show Flathub in this version, capture the output and don't paper over it; fallback is `sudo flatpak remote-add --system --if-not-exists flathub /usr/share/flatpak/remotes.d/flathub.flatpakrepo`.
+1. Complete Calamares on the virtual SSD, shut down, then start the installed boot with the ISO detached. Verify login, wallpaper and app-grid entries with the NIC absent.
+2. Verify `flatpak remotes --system --show-details` lists Flathub. Open **TTablet App Store** offline and check that setup reports failure, the window can be closed, and you can continue using the desktop. Open **System Updates** and verify the Updates page is still reachable. Cached or empty results offline are expected.
+3. Shut down and rerun the installed command without `TTABLET_UEFI_OFFLINE`. Connect, open **TTablet App Store**, confirm the download, and check that Bazaar opens. Test a cancel and retry. Reopen the launcher and confirm it opens Bazaar directly. Test touch search with Squeekboard, install/update/remove an app, and try a file picker in a sandboxed app. Verify that a newly installed Flatpak appears in the app grid, including after logout/login if needed.
+4. Open **System Updates**, refresh, and compare pending Debian updates with `apt list --upgradable` after `sudo apt update`. Confirm a `trixie-security` source in the update output. If a suitable update is pending, apply it in the VM and check the restart and installed version. Firmware detection and update availability depend on hardware. Check the firmware UI and CLI on the Surface.
+5. Record the ISO checksum, app/runtime download and installed size, any Flatpak export refresh delay, and each observed result. Repeat app-store and Updates tests in portrait and landscape on the Surface.
 
-**Optional Bazaar functionality test, requires networking and is NOT part of offline Calamares:**
+## Surface testing and recovery
 
-```bash
-flatpak install flathub io.github.kolunmi.Bazaar
-flatpak run io.github.kolunmi.Bazaar
+Boot the candidate from USB after the VM test. Use a separate test drive for an installed Surface trial and verify the Calamares target before writing partitions. Keep the working internal SSD available and the known-good 0.5 USB image handy. Use the live USB for touch, Wi-Fi, screen rotation and short suspend tests. Repeat installed login, app and update checks on the separate drive.
+
+If Bazaar setup fails, reconnect and reopen **TTablet App Store**. Use Console to distinguish a missing remote from an install or launch failure.
+
+```sh
+flatpak remotes --system --show-details
+# If the system Flathub remote is missing and the descriptor is present:
+sudo flatpak remote-add --system --if-not-exists flathub /usr/share/flatpak/remotes.d/flathub.flatpakrepo
+flatpak remote-info --system flathub io.github.kolunmi.Bazaar
+flatpak install --system flathub io.github.kolunmi.Bazaar
+flatpak run --system io.github.kolunmi.Bazaar
 ```
 
-Check portrait/landscape, on-screen keyboard, app search and install/update/remove, portal file picker/permissions. Confirm GNOME Software can still update a Debian package and check firmware updates.
+If the image descriptor is missing, use [Flathub's Debian instructions](https://flathub.org/en/setup/Debian) after reconnecting and capture the build version and missing file for the draft. If app icons are missing after install, log out and back in and check that `XDG_DATA_DIRS` includes `/var/lib/flatpak/exports/share`.
 
-Then run a fresh **disposable** UEFI Calamares installed QEMU test (ISO detached), checking the wallpaper, Flatpak remote and basic login. Physical Surface test **only after** QEMU succeeds. Don't overwrite the currently working SSD install to try a wallpaper.
+If the Updates launcher is unavailable, open Software and select **Updates**, or use Console.
 
-## Rollback
+```sh
+sudo apt update
+sudo apt upgrade
+fwupdmgr get-devices
+fwupdmgr get-remotes
+fwupdmgr refresh
+fwupdmgr get-updates
+# On supported hardware, with power connected, review and apply an offered update:
+fwupdmgr update
+```
 
-Stage A is a new branch and has no effect on the current installed TTablet until explicitly installed or the packages/configuration are manually applied. If unwanted in the next build, remove `flatpak` from the 0.6 package list and remove the 0.6 artwork, schema override and two hooks; the 0.5 branch is unchanged. Existing users may have their own wallpaper saved in GSettings, which should take precedence over the new default.
+Choose a different wallpaper in Settings. To undo the image default on a candidate install, remove `/usr/share/glib-2.0/schemas/99_ttablet.gschema.override`, run `sudo glib-compile-schemas /usr/share/glib-2.0/schemas`, and log out and back in. To remove the candidate shortcuts, delete the two `ttablet-*.desktop` files installed under `/usr/share/applications`. The native Software launcher remains available.
 
-## Next steps
-
-- Stage B: package Bazaar **inside the ISO** so its first launch is possible offline; include the exact Flatpak runtime and test its deployment across Calamares's filesystem copy. Evaluate reproducibility, size, and release updates; choose whether the store should be in the core ISO or in a minimal optional feature layer.
-- Stage C: touch-friendly **System Updates** UI for Debian/Surface + firmware while Bazaar handles user apps. Retire/de-emphasize GNOME Software as a general app storefront only when the update path is tested.
-- Stage D: tune launchers, matching GTK accent/window details only if supported by current Phosh; refine metadata and branding without interfering with touch behavior.
-
-Related but separate: [Type Cover docking automation #8](https://github.com/BurkeZerk/ttablet/issues/8), [future setup wizard #9](https://github.com/BurkeZerk/ttablet/issues/9), and [deferred standby test #6](https://github.com/BurkeZerk/ttablet/issues/6).
+Offline Bazaar bundling remains a release decision. It needs an ISO size comparison and a successful offline launch after a fresh Calamares install with the runtime present. [Type Cover switching #8](https://github.com/BurkeZerk/ttablet/issues/8) stays separate. The [setup wizard #9](https://github.com/BurkeZerk/ttablet/issues/9) stays deferred.

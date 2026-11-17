@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=System Updates
+Comment=Check for Debian system and device firmware updates
+Exec=gnome-software --mode=updates
+TryExec=gnome-software
+Icon=system-software-update
+Terminal=false
+Categories=GTK;Settings;PackageManager;
+Keywords=Debian;APT;Security;Firmware;
+X-Purism-FormFactor=Workstation;Mobile;

@@ -8,7 +8,7 @@ VARS="$LAB/OVMF_VARS.4m.fd"
 OVMF_DIR="/usr/share/edk2/x64"
 CODE="$OVMF_DIR/OVMF_CODE.4m.fd"
 VARS_TEMPLATE="$OVMF_DIR/OVMF_VARS.4m.fd"
-VERSION="${TTABLET_VERSION:-0.5.0-dev}"
+VERSION="${TTABLET_VERSION:-0.6.0-dev}"
 ISO="${TTABLET_UEFI_ISO:-$ROOT/dist/ttablet-$VERSION-surface-amd64.iso}"
 
 usage() {
@@ -16,6 +16,7 @@ usage() {
     '  ./scripts/uefi-lab.sh init       Create a new virtual SSD and UEFI variables' \
     '  ./scripts/uefi-lab.sh live       Boot ISO with disposable virtual SSD' \
     '  ./scripts/uefi-lab.sh installed  Boot virtual SSD without ISO'
+  printf '%s\n' '  Set TTABLET_UEFI_OFFLINE=1 to start with no network adapter.'
 }
 
 case "${1:-help}" in
@@ -54,6 +55,9 @@ case "${1:-help}" in
     else
       args+=( -boot order=c )
       echo 'Booting installed virtual SSD without ISO.'
+    fi
+    if [[ "${TTABLET_UEFI_OFFLINE:-0}" == 1 ]]; then
+      args+=( -nic none )
     fi
     exec qemu-system-x86_64 "${args[@]}"
     ;;

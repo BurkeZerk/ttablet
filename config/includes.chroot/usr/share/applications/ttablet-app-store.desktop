@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=TTablet App Store
+Comment=Browse, install and update Flatpak apps with Bazaar
+Exec=/usr/local/libexec/ttablet-app-store
+Icon=system-software-install
+Terminal=false
+Categories=GTK;Settings;PackageManager;
+Keywords=Bazaar;Flathub;Flatpak;Apps;
+X-Purism-FormFactor=Workstation;Mobile;

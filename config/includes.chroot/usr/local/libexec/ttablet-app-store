@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+app=io.github.kolunmi.Bazaar
+
+if flatpak info --system "$app" >/dev/null 2>&1; then
+    exec flatpak run --system "$app"
+fi
+
+if flatpak info --user "$app" >/dev/null 2>&1; then
+    exec flatpak run --user "$app"
+fi
+
+if [ "${1:-}" != --install ]; then
+    exec kgx -e "$0 --install"
+fi
+
+printf '%s\n' 'Install Bazaar from Flathub to open the TTablet App Store.' \
+    'Connect to the internet first. The first download includes a shared runtime.'
+if flatpak install --system flathub "$app" && flatpak info --system "$app" >/dev/null 2>&1; then
+    exec flatpak run --system "$app"
+fi
+
+printf '\n%s\n' 'Bazaar setup did not finish. Check your connection and reopen TTablet App Store to retry.'
+printf '%s' 'Press Enter or close this window. '
+read -r unused || :
+exit 1

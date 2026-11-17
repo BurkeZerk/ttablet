@@ -14,6 +14,13 @@ required=(
   linux-image-surface
   phosh-tablet
   flatpak
+  gnome-console
+  gnome-software
+  gnome-software-plugin-deb
+  gnome-software-plugin-fwupd
+  packagekit
+  fwupd
+  xdg-desktop-portal-gtk
   iptsd
   wpasupplicant
   wireless-regdb
@@ -44,4 +51,4 @@ for package in "${required[@]}"; do
   fi
 done
 
-echo "Verified base, lean installer and 0.6 Flatpak packages in ISO manifest"
+echo "Verified base, lean installer and 0.6 app and update packages in ISO manifest"
