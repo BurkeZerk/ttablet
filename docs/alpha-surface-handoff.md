@@ -103,3 +103,25 @@ logs from the separate test drive before attempting repair. Reinstall only that
 explicitly verified test drive if needed. A bootloader repair must target its EFI
 partition, not the protected internal disk. Practice live-media rescue and
 candidate-drive inspection in the disposable VM before claiming R1 Pass.
+
+## Candidate-specific handoff: 0.1.0-alpha.4
+
+Test `ttablet-0.1.0-alpha.4-surface-amd64.iso`, SHA-256
+`9290aa495a43b1671e7bd72a0c30b6916043851915fede70510c02613d7353ca`,
+built from `df74847fc0eca6f2ca73ebd771e58387a601e14d`. See the
+[validation record](alpha-0.1-validation.md) for exact evidence.
+All S1–S3 entries remain Pending until an operator records results on this image.
+
+In the VM, Calamares was found through Show All Apps, and account text entry
+needed keyboard events; explicitly check touch-only installer input on Surface.
+A manually created second account needed Phosh selected in GDM; the account
+created by Calamares defaulted to Phosh correctly. Cancelled Flatpak output can
+show a terminal control sequence in its detail line; retry remains functional.
+The installed VM emitted locale warnings (only C/C.UTF-8 available); English GUI
+workflows passed. Do not infer other locale support.
+
+Use `uname -r`, `loginctl session-status`, `fwupdmgr get-devices`, and
+`fwupdmgr get-remotes` in the operator log. Record each S1–S3 step as Pass, Fail,
+or Blocked, with orientation, Type Cover state, power source and evidence path.
+Stop promotion on failed login, touch-only text entry, Wi-Fi after wake, native
+update, or boot recovery. Keep the working internal SSD intact throughout.
