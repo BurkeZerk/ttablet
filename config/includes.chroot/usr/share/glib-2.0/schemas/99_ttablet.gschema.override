@@ -1,6 +1,6 @@
 # TTablet's original wallpaper; deliberately overridable by each user.
 # Both modes use the same quiet dark background for a consistent Phosh feel.
-[org.gnome.desktop.background]
+[org.gnome.desktop.background:Phosh]
 picture-uri='file:///usr/share/backgrounds/ttablet/ttablet.svg'
 picture-uri-dark='file:///usr/share/backgrounds/ttablet/ttablet.svg'
 picture-options='zoom'

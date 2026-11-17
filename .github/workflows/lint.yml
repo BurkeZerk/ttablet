@@ -199,7 +199,7 @@ jobs:
           ElementTree.parse(sys.argv[1])
           parser = configparser.ConfigParser()
           parser.read(sys.argv[2])
-          section = parser["org.gnome.desktop.background"]
+          section = parser["org.gnome.desktop.background:Phosh"]
           expected = "'file:///usr/share/backgrounds/ttablet/ttablet.svg'"
           assert section["picture-uri"] == expected
           assert section["picture-uri-dark"] == expected
@@ -207,5 +207,9 @@ jobs:
           PY
           cp "$override" /usr/share/glib-2.0/schemas/
           glib-compile-schemas --strict /usr/share/glib-2.0/schemas
+          export XDG_CURRENT_DESKTOP=Phosh GSETTINGS_BACKEND=memory
+          expected="'file:///usr/share/backgrounds/ttablet/ttablet.svg'"
+          test "$(gsettings get org.gnome.desktop.background picture-uri)" = "$expected"
+          test "$(gsettings get org.gnome.desktop.background picture-uri-dark)" = "$expected"
           desktop-file-validate config/includes.chroot/usr/share/applications/ttablet-*.desktop
           echo "TTablet wallpaper defaults and launchers validated"
