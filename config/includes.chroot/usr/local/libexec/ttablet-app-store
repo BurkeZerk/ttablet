@@ -24,4 +24,3 @@ fi
 printf '\n%s\n' 'Bazaar setup did not finish. Check your connection and reopen TTablet App Store to retry.'
 printf '%s' 'Press Enter or close this window. '
 read -r unused || :
-exit 1
