@@ -25,16 +25,20 @@ Choose a few real tasks and note friction, not just whether a program starts. Fo
 
 Record **observed problem → expected behavior → exact reproduction → severity → preferred minimal fix**. Prioritize issues that block ordinary touch-only tasks, not aesthetic polish. No need to run battery measurements between every change.
 
-## Phase 2: coherent application management
+## Phase 2: Bazaar as default app store (decision; not yet implemented)
 
-Retain **GNOME Software as the single user-facing app-management interface**, with existing Debian package and firmware plugins. Determine whether its UI actually works well on Phosh before adding another layer.
+**UX finding:** GNOME Software successfully searched, downloaded and installed an APT application on the physical Surface with working on-screen keyboard and PIN authentication, but its interface was judged awkward and unattractive. A hands-on Bazaar trial was received positively; the chosen direction is **Flatpak-first** for optional user applications.
 
-Future decision: `gnome-software-plugin-flatpak` + Flatpak/Flathub to broaden available tablet apps in the **same interface**. Evaluate app catalog, disk usage, repository trust, update behavior and how sandbox permissions affect file integration; do not add solely for the sake of having Flatpak. Avoid a second store.
+**Architecture:** Debian/APT remains responsible for the base OS, kernel, drivers, native helpers and OS updates; Flathub/Flatpak provides optional everyday applications via **Bazaar as the primary app storefront**. Track integration and testing in [issue #7](https://github.com/BurkeZerk/ttablet/issues/7).
+
+Important: Bazaar is **Flatpak-only**, not a replacement for GNOME Software's Debian/PackageKit and firmware-update workflows. Preserve these native-update functions until a usable touch-first **System Updates** surface is implemented and tested. Avoid two competing prominent app-store launchers after the migration. Shipping Bazaar in the ISO versus bootstrapping it at first login requires an explicit offline-boot/install decision. Flatpak has shared runtimes, sandbox permission tradeoffs, and nontrivial initial downloads; don't mischaracterize it as requiring no system integration.
+
+The current installed baseline is stable. Make these changes in a reversible next-phase branch with QEMU and Surface acceptance tests, rather than replacing the working store in place.
 
 ## Phase 3: deliberate polish
 
-- Build a concise set of default applications only after identifying real tasks.
-- Improve first-run guidance, names/icons/theme and update/recovery documentation without reintroducing unnecessary tour apps.
+- Keep optional applications out of the ISO. [Deferred first-run setup wizard #9](https://github.com/BurkeZerk/ttablet/issues/9) should help users opt into curated Flatpak apps after installation, when convenient, and work gracefully offline.
+- Improve first-run guidance, names/icons/theme and update/recovery documentation without reintroducing unnecessary tour apps. The wizard is wishlist scope, not a current blocker.
 - Consider the login/lock-screen touch experience, camera and stylus usability as later acceptance targets.
 - Package/release hygiene: final package count, tested ISO checksum, repeatable clean install, documented Secure Boot stance, and known limitations.
 
