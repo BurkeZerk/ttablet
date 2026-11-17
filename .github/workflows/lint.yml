@@ -40,6 +40,8 @@ jobs:
           linux-image-surface 1.0
           phosh-tablet 1.0
           flatpak:amd64 1.16
+          python3-gi 3.50
+          gir1.2-gtk-3.0 3.24
           gnome-console 48.0
           gnome-software 48.3
           gnome-software-plugin-deb 48.3
@@ -63,7 +65,7 @@ jobs:
           intel-gpu-tools 2.0
           MANIFEST
           bash scripts/check-manifest.sh "$positive"
-          for package in flatpak gnome-console gnome-software gnome-software-plugin-deb \
+          for package in python3-gi gir1.2-gtk-3.0 flatpak gnome-console gnome-software gnome-software-plugin-deb \
               gnome-software-plugin-fwupd packagekit fwupd xdg-desktop-portal-gtk \
               wpasupplicant wireless-regdb grub-efi grub-efi-amd64 \
               grub-efi-amd64-bin grub2-common efibootmgr intel-media-va-driver \
@@ -189,7 +191,7 @@ jobs:
         run: |
           set -eu
           apt-get update
-          apt-get install -y --no-install-recommends desktop-file-utils libglib2.0-bin gsettings-desktop-schemas python3
+          apt-get install -y --no-install-recommends desktop-file-utils libglib2.0-bin gsettings-desktop-schemas python3 python3-gi gir1.2-gtk-3.0 xvfb xauth
           override=config/includes.chroot/usr/share/glib-2.0/schemas/99_ttablet.gschema.override
           wallpaper=config/includes.chroot/usr/share/backgrounds/ttablet/ttablet.svg
           test -s "$override"
@@ -214,4 +216,5 @@ jobs:
           test "$(gsettings get org.gnome.desktop.background picture-uri)" = "$expected"
           test "$(gsettings get org.gnome.desktop.background picture-uri-dark)" = "$expected"
           desktop-file-validate config/includes.chroot/usr/share/applications/*.desktop
-          echo "TTablet wallpaper defaults and launchers validated"
+          xvfb-run -a python3 tests/gtk-welcome-smoke.py
+          echo "TTablet wallpaper defaults, launchers and GTK flows validated"

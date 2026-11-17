@@ -75,3 +75,33 @@ The official Flathub descriptor is part of the image at `/usr/share/flatpak/remo
 3. Lock and unlock, suspend briefly, and confirm that touch and Wi-Fi recover after wake. Repeat core input checks in portrait and landscape.
 4. To verify the installed path, use a spare drive with the working internal installation protected. Choose the target by its capacity and model in Calamares. Reboot with the installer USB unplugged, sign in with a test PIN, and repeat touch, lock, app and networking checks.
 5. Record the digest, firmware settings, live or installed environment and observed results. Keep the prototype's prior results separate from the Alpha's physical test results.
+
+## Integrated candidate changes
+
+The integration branch restores GNOME Software, its Debian and fwupd plugins,
+and PackageKit. **System Updates** is independent of Welcome and Flatpak.
+**TTablet Welcome** replaces the early Optional Apps dialog. It offers Wi-Fi,
+App Store and native updates, zero selected optional apps, a versioned catalog,
+confirmation, progress, Cancel and retry. It uses the existing GTK runtime plus
+Python GI, not a bundled web runtime. The catalog's Papers, Decibels and Text
+Editor IDs were checked against their official Flathub listings on 2026-11-17.
+
+App Store and Welcome use the same per-session Flatpak transaction lock and
+system scope, honoring existing user-scope installations. Bazaar's desktop ID is
+shared by the image launcher and upstream export to avoid a second grid entry.
+Bazaar and shared runtimes remain on-demand: they cannot launch offline until
+installed. No optional Flatpak payload is bundled. Bundle size/launch evaluation
+is a separate pending experiment; no footprint savings are claimed without
+measurement. Removal never requests deletion of app data.
+
+The default build label is `0.1.0-alpha.1`; explicitly set `TTABLET_VERSION` for
+each candidate. Existing historical package versions and branch labels are
+preserved. See [physical handoff](alpha-surface-handoff.md) for exact Surface
+checks. Type Cover automation remains pending; manual Undocked mode is the
+supported route. This milestone is not a stability claim.
+
+For headless QEMU testing, set `TTABLET_UEFI_HEADLESS=1` and
+`TTABLET_QMP_SOCKET=/tmp/ttablet-alpha-qmp.sock` alongside the documented lab
+variables. This changes display/control only; the offline path still uses
+`-nic none` and the installed path detaches the ISO. The socket is local. Use a
+fresh lab for each offline install and do not reuse a real block device.

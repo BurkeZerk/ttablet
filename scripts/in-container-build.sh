@@ -51,6 +51,7 @@ cp -- "$manifest" "/dist/${TTABLET_STEM}.packages.txt"
 
 cd /dist
 sha256sum "${TTABLET_STEM}.iso" > "${TTABLET_STEM}.iso.sha256"
+sha256sum -c "${TTABLET_STEM}.iso.sha256"
 {
   printf 'source_commit=%s\n' "$TTABLET_SOURCE_COMMIT"
   printf 'builder_image_id=%s\n' "$TTABLET_BUILDER_IMAGE_ID"

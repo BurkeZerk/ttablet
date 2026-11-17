@@ -8,7 +8,7 @@ VARS="$LAB/OVMF_VARS.4m.fd"
 OVMF_DIR="/usr/share/edk2/x64"
 CODE="$OVMF_DIR/OVMF_CODE.4m.fd"
 VARS_TEMPLATE="$OVMF_DIR/OVMF_VARS.4m.fd"
-VERSION="${TTABLET_VERSION:-0.1-alpha}"
+VERSION="${TTABLET_VERSION:-0.1.0-alpha.1}"
 ISO="${TTABLET_UEFI_ISO:-$ROOT/dist/ttablet-$VERSION-surface-amd64.iso}"
 
 usage() {
@@ -58,6 +58,11 @@ case "${1:-help}" in
     fi
     if [[ "${TTABLET_UEFI_OFFLINE:-0}" == 1 ]]; then
       args+=( -nic none )
+    fi
+    if [[ "${TTABLET_UEFI_HEADLESS:-0}" == 1 ]]; then
+      : "${TTABLET_QMP_SOCKET:?Set a short absolute QMP socket path for headless testing}"
+      args+=( -display none -qmp "unix:$TTABLET_QMP_SOCKET,server=on,wait=off"
+              -device qemu-xhci -device usb-tablet -serial "file:$LAB/serial.log" )
     fi
     exec qemu-system-x86_64 "${args[@]}"
     ;;

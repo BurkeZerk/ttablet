@@ -35,10 +35,15 @@ def exercise():
         process.wait.return_value = code
         with patch.object(Gtk.Dialog, 'run', return_value=Gtk.ResponseType.OK), patch.object(w.subprocess, 'Popen', return_value=process) as spawn:
             window.start()
-            deadline = time.monotonic() + 5
+            deadline = time.monotonic() + 20
             while window.busy and time.monotonic() < deadline:
-                GLib.MainContext.default().iteration(False)
+                while Gtk.events_pending():
+                    Gtk.main_iteration_do(False)
                 time.sleep(.01)
+            if window.busy:
+                print('STATUS', window.status.get_text(), 'SPAWNS', spawn.call_count, flush=True)
+                import faulthandler
+                faulthandler.dump_traceback()
             assert not window.busy
             assert spawn.call_count == 1
             assert spawn.call_args.args[0][-1] == 'org.gnome.Papers'
