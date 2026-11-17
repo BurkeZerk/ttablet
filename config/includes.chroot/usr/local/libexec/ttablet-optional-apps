@@ -1,0 +1,82 @@
+#!/bin/sh
+set -eu
+
+state_dir=${XDG_STATE_HOME:-"$HOME/.local/state"}/ttablet
+done_file=$state_dir/optional-apps-complete
+title='Optional Apps'
+
+finish_setup() {
+    if ! mkdir -p "$state_dir" || ! touch "$done_file"; then
+        zenity --error --title="$title" --text='Could not save your setup choice.' || :
+        return 1
+    fi
+}
+
+if [ "${1:-}" = --first-run ]; then
+    if [ -e "$done_file" ] || grep -Eq '(^| )boot=live( |$)' /proc/cmdline; then
+        exit 0
+    fi
+fi
+
+# Share the per-session installation lock with Bazaar setup.
+exec 9>"${XDG_RUNTIME_DIR:?}/ttablet-bazaar.lock"
+if ! flock -n 9; then
+    exit 0
+fi
+
+if [ "${1:-}" = --install ]; then
+    shift
+    if flatpak install --system --app --assumeyes flathub "$@"; then
+        finish_setup
+        zenity --info --title="$title" --text='Your apps are ready. Open them from the app grid.' || :
+    else
+        zenity --error --title="$title" \
+            --text='Installation did not finish. Check your connection and reopen Optional Apps to retry.' || :
+    fi
+    exit 0
+fi
+
+first_run=${1:-}
+set --
+add_option() {
+    if ! flatpak info --system "$2" >/dev/null 2>&1 &&
+        ! flatpak info --user "$2" >/dev/null 2>&1; then
+        printf '%s\n' "$1" "$2"
+    fi
+}
+options=$(add_option Calculator org.gnome.Calculator
+          add_option Weather org.gnome.Weather
+          add_option Clocks org.gnome.clocks)
+if [ -z "$options" ]; then
+    finish_setup
+    if [ "$first_run" != --first-run ]; then
+        zenity --info --title="$title" --text='Calculator, Weather and Clocks are already installed.' || :
+    fi
+    exit 0
+fi
+
+# Each option has a fixed display name and Flatpak ID on separate lines.
+while IFS= read -r name && IFS= read -r id; do
+    set -- "$@" FALSE "$name" "$id"
+done <<OPTIONS
+$options
+OPTIONS
+
+if selection=$(zenity --list --checklist --title="$title" --width=360 --height=360 \
+    --text='Choose apps to install from Flathub. Downloads include any shared runtimes they need.' \
+    --column='Install' --column='App' --column='ID' --hide-column=3 --print-column=3 \
+    --separator='|' --ok-label=Install --cancel-label=Skip -- "$@"); then
+    set --
+    case "|$selection|" in *'|org.gnome.Calculator|'*) set -- "$@" org.gnome.Calculator ;; esac
+    case "|$selection|" in *'|org.gnome.Weather|'*) set -- "$@" org.gnome.Weather ;; esac
+    case "|$selection|" in *'|org.gnome.clocks|'*) set -- "$@" org.gnome.clocks ;; esac
+    if [ "$#" -gt 0 ]; then
+        exec 9>&-
+        exec kgx -e "$0 --install $*"
+    fi
+else
+    # Zenity uses 1 for Cancel and for closing the dialog.
+    result=$?
+    [ "$result" -eq 1 ] || exit "$result"
+fi
+finish_setup

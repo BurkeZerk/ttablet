@@ -28,7 +28,7 @@ if ! flock -n 9; then
 fi
 
 if flatpak info --system "$app" >/dev/null 2>&1 ||
-    flatpak install --system --noninteractive flathub "$app"; then
+    flatpak install --system --app --assumeyes flathub "$app"; then
     exec 9>&-
     exec flatpak run --system "$app"
 fi

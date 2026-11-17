@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Optional Apps
+Comment=Choose extra apps to install from Flathub
+Exec=/usr/local/libexec/ttablet-optional-apps
+Icon=system-software-install
+Terminal=false
+Categories=GTK;Settings;PackageManager;
+Keywords=Setup;Calculator;Weather;Clocks;Flathub;
+X-Purism-FormFactor=Workstation;Mobile;
