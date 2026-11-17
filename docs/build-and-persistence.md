@@ -1,5 +1,8 @@
 # Build and persistence testing
 
+This guide records the 0.3 workflow. For the integrated Alpha, follow
+[DEVELOPMENT.md](../DEVELOPMENT.md) for current build and persistence commands.
+
 TTablet 0.3 is a Debian 13 (Trixie) live image for the Surface Pro 7. The build host can be CachyOS; Debian Live Build runs inside a privileged Podman container. The repository is mounted read-only, but the container has extensive host privileges: use it only with trusted scripts. A dedicated Debian VM is safer for contributors who don't want to grant those permissions.
 
 ## Prerequisites (CachyOS)

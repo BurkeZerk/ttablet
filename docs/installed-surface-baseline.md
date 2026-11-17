@@ -62,4 +62,4 @@ An **early** lean ISO counted 1,095 packages versus 1,561 in the older full imag
 
 **Performance optimization paused.** Preserve this build as the initial installed-hardware baseline. Work next on **touch-first usability**, particularly package-manager experience, text entry, navigation, browser touch behavior, settings, file flows, and day-to-day suspend/wake. Keep package/backend changes isolated, avoid unnecessary daemon removal, and collect targeted metrics only when a usability issue suggests they are needed.
 
-See [roadmap](roadmap.md) for suggested next validation targets and [deferred standby issue #6](https://github.com/BurkeZerk/ttablet/issues/6).
+See the [Alpha roadmap](../ROADMAP.md) for next validation targets and [deferred standby issue #6](https://github.com/BurkeZerk/ttablet/issues/6).

@@ -2,32 +2,10 @@
 
 The [development specification](development-spec-0.1.md) defines release gates. This branch continues from the [installed 0.5 Lean Surface baseline](installed-surface-baseline.md) and the 0.6 app-store candidate. The older guides describe their respective images.
 
-## Build
-
-Use an amd64 Linux machine or a disposable Linux VM with Git, rootless Podman, pasta, and room for at least 20 GB of working files. Podman needs working subordinate UID/GID mappings and a private network namespace. QEMU and OVMF are required for the guest tests. The UEFI test helper expects the CachyOS/Arch OVMF path in `/usr/share/edk2/x64`. Use the equivalent OVMF files when running QEMU directly on another host.
-
-From a clean checkout of the desired Alpha commit, run:
-
-```sh
-./scripts/build.sh
-(cd dist && sha256sum -c ttablet-0.1.0-alpha.1-surface-amd64.iso.sha256)
-```
-
-The build uses a Git snapshot, an ephemeral rootless Debian container with nested mounts enabled, and a fresh workspace. It leaves a hybrid ISO, checksum, package manifest, provenance and build log in `dist/`. Failure keeps the workspace inside `.build/` for diagnosis. Set `TTABLET_KEEP_WORKDIR=1` to keep a successful workspace for inspecting the generated ISO tree.
-
-Set `TTABLET_VERSION` to a new artifact label to keep each run. The boot menu always identifies this milestone as TTablet 0.1 Alpha. Pin `TTABLET_CONTAINER_IMAGE` to the builder digest shown in provenance to repeat the builder selection. Debian and Linux-Surface mirrors are live, so repeat clean builds close together and compare the manifests and the generated ISO content. Record checksums separately for each artifact. Archive snapshots and deterministic timestamps are still needed for a byte-identical build.
-
-If a fresh build cannot mount `/sys` during live-build, verify Podman's rootless configuration and that pasta provides a separate network namespace. The builder uses mount capabilities inside its container. A disposable amd64 Linux VM is an alternative host for the same script.
-
 ## Boot and install in a disposable VM
 
-```sh
-# Set this to the label for the image being checked.
-export TTABLET_VERSION=0.1.0-alpha.1
-export TTABLET_UEFI_LAB_DIR="$PWD/.build/alpha-uefi"
-./scripts/uefi-lab.sh init
-TTABLET_UEFI_OFFLINE=1 ./scripts/uefi-lab.sh live
-```
+Follow [DEVELOPMENT.md](../DEVELOPMENT.md) for the build, checksum verification,
+and UEFI lab commands. Use a fresh lab and boot the live image offline.
 
 Use the standard TTablet live boot entry. Confirm that Phosh opens with the Quiet Orbit wallpaper. Open Files, Settings and Console and check application search. Use the live installer's virtual SSD and choose a test-only numeric password. Shut the guest down when Calamares completes and run:
 
@@ -37,7 +15,7 @@ TTABLET_UEFI_OFFLINE=1 ./scripts/uefi-lab.sh installed
 
 Sign in, check TTablet Welcome, then exercise lock and unlock. Verify that Flathub is listed with `flatpak remotes --system --show-details`. Open TTablet App Store, try initial setup offline, acknowledge the error and return to Phosh. If the session lacks the app store icon, search for **TTablet App Store** by name.
 
-Shut down and start the installed guest with networking using `./scripts/uefi-lab.sh installed`. Verify that TTablet Welcome reopens from the app grid, offers only apps that are absent, and installs the selected apps. The first-run prompt is limited to installed Phosh accounts. Closing or skipping Welcome records completion under `${XDG_STATE_HOME:-$HOME/.local/state}/ttablet/`.
+Shut down and start the installed guest with networking using `./scripts/uefi-lab.sh installed`. Verify that TTablet Welcome reopens from the app grid, disables apps already installed, and installs the selected apps. The first-run prompt is limited to installed Phosh accounts. Closing or skipping Welcome records completion under `${XDG_STATE_HOME:-$HOME/.local/state}/ttablet/`.
 
 Open TTablet App Store, confirm the Bazaar download, then launch the store again. The first download includes a shared Flatpak runtime. Use Cancel setup to interrupt a download; completed apps are retained. Open the store again to retry. In Bazaar, search, install, launch and remove a small app. Log out and back in if a newly exported Flatpak launcher is missing from the app grid. Check file picking in a sandboxed app.
 
@@ -94,14 +72,6 @@ installed. No optional Flatpak payload is bundled. Bundle size/launch evaluation
 is a separate pending experiment; no footprint savings are claimed without
 measurement. Removal never requests deletion of app data.
 
-The default build label is `0.1.0-alpha.1`; explicitly set `TTABLET_VERSION` for
-each candidate. Existing historical package versions and branch labels are
-preserved. See [physical handoff](alpha-surface-handoff.md) for exact Surface
-checks. Type Cover automation remains pending; manual Undocked mode is the
-supported route. This milestone is not a stability claim.
-
-For headless QEMU testing, set `TTABLET_UEFI_HEADLESS=1` and
-`TTABLET_QMP_SOCKET=/tmp/ttablet-alpha-qmp.sock` alongside the documented lab
-variables. This changes display/control only; the offline path still uses
-`-nic none` and the installed path detaches the ISO. The socket is local. Use a
-fresh lab for each offline install and do not reuse a real block device.
+Manual Undocked mode is supported. Use the
+[physical handoff](alpha-surface-handoff.md) for the Surface checks and
+[ROADMAP.md](../ROADMAP.md) for candidate limitations and deferred work.

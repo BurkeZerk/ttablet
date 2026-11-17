@@ -1,32 +1,18 @@
 # TTablet
 
-A small, experimental Debian-based Linux tablet distribution for Microsoft Surface hardware, initially the Surface Pro 7.
+TTablet is a Debian-based, touchscreen-first Linux distribution for the
+Microsoft Surface Pro 7. This checkout tracks the integrated TTablet 0.1 Alpha.
+The Alpha.4 candidate passed VM validation. The earlier 0.5 Lean installation
+is the recorded physical Surface baseline.
 
-The `alpha/0.1` branch develops **TTablet 0.1 Alpha**. See the [development specification](docs/development-spec-0.1.md) and the [Alpha build, test and recovery guide](docs/alpha-0.1.md). The existing Surface installation and older candidate branches are recorded below.
+- [DEVELOPMENT.md](DEVELOPMENT.md) covers building, local checks, and testing a change.
+- [ARCHITECTURE.md](ARCHITECTURE.md) maps the image inputs, hooks, and runtime components.
+- [ROADMAP.md](ROADMAP.md) records Alpha capabilities, known issues, and next milestones.
+- The [Alpha workflow guide](docs/alpha-0.1.md), [release notes](docs/alpha-0.1-release-notes.md),
+  and [validation record](docs/alpha-0.1-validation.md) cover the tested candidate.
+- The [Surface handoff](docs/alpha-surface-handoff.md) covers physical validation
+  and recovery. The [0.5 Lean baseline](docs/installed-surface-baseline.md)
+  records the earlier internal-SSD installation.
 
-**Installed baseline (November 2026):** **TTablet 0.5 Lean is running from the internal SSD of a Surface Pro 7** following a reported successful Calamares installation. Built around the Linux-Surface kernel, Phosh and Debian 13 (Trixie). This is the first physical-hardware installation milestone, **not a stable release**. The installed-image hash/build commit has not been independently recorded; real-world testing remains limited to one device.
-
-**Branches:** `main` currently contains the earlier 0.4 milestone; [PR #4](https://github.com/BurkeZerk/ttablet/pull/4) contains 0.5 performance/diagnostics work; [PR #5](https://github.com/BurkeZerk/ttablet/pull/5) is stacked on #4 and contains the lean build plus Calamares/boot/network fixes. Both PRs remain draft pending intentional integration. New development should build from `experiment/0.5-lean-recommends` until the branches are reconciled.
-
-See the [installed Surface baseline](docs/installed-surface-baseline.md) and [development roadmap](docs/roadmap.md). The next [0.6 Application Experience milestone](docs/application-experience-0.6.md) is in a **separate, unmerged candidate branch**; it does not change the currently installed Surface.
-
-## Revisit the 0.5 Lean build on CachyOS
-
-    sudo pacman -S --needed git podman qemu-desktop e2fsprogs
-    git clone https://github.com/BurkeZerk/ttablet.git
-    cd ttablet
-    git switch --track origin/experiment/0.5-lean-recommends
-    ./scripts/build.sh
-    ./scripts/test-qemu.sh
-
-See [build and persistence instructions](docs/build-and-persistence.md), the [historical UEFI installation lab](docs/installer-lab.md), the [0.5 performance history](docs/performance-0.5.md), and the [lean image design and test record](docs/lean-0.5-experiment.md).
-
-## Project principles
-
-- Keep the Linux-Surface kernel and touch stack functional.
-- Make all ordinary tasks navigable using touch alone.
-- Favor lightweight web browsing, reading, media, and remote-access use cases.
-- Preserve a bootable test image before risky changes.
-- Prefer transparent build inputs and small changes over manual customization that cannot be recreated.
-
-Contributions and hardware testing are welcome. Changes should be tested in QEMU and, where practical, on real Surface hardware before being called stable.
+Keep a verified image and its checksum available while developing. Keep changes
+small and test the affected path in QEMU before using spare Surface media.
