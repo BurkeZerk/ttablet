@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+# Keep the native service/backends and direct Updates route; hide only its store
+# grid entry. The Updates route was exercised in the 0.6 baseline and must be
+# revalidated on every candidate before release.
+command -v gnome-software >/dev/null
+test -s /usr/share/applications/ttablet-system-updates.desktop
+entry=/usr/share/applications/org.gnome.Software.desktop
+test -s "$entry"
+if grep -q '^NoDisplay=' "$entry"; then
+    sed -i 's/^NoDisplay=.*/NoDisplay=true/' "$entry"
+else
+    sed -i '/^\[Desktop Entry\]/a NoDisplay=true' "$entry"
+fi
