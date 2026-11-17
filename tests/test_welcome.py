@@ -66,6 +66,8 @@ class TransactionTests(unittest.TestCase):
             self.assertEqual(w.install_selected(selected, event, lambda _: None, processes.append), 0)
             self.assertEqual(popen.call_count, 1)
             self.assertEqual(popen.call_args.args[0][-1], 'org.test.Second')
+            self.assertNotIn('--noninteractive', popen.call_args.args[0])
+            self.assertEqual(popen.call_args.kwargs['stdin'], w.subprocess.DEVNULL)
         with patch.object(w.subprocess, 'Popen') as popen:
             self.assertEqual(w.install_selected([], event, lambda _: None, processes.append), 0)
             event.set()

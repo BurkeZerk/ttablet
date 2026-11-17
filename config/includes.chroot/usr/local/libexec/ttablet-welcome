@@ -45,8 +45,8 @@ def install_selected(selected, cancelled, report, process_changed):
         if installed_scope(app['id']):
             continue
         process = subprocess.Popen(['flatpak', 'install', '--system', '--app', '--assumeyes',
-                                    '--noninteractive', 'flathub', app['id']],
-                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                    'flathub', app['id']],
+                                   stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                    text=True, start_new_session=True)
         process_changed(process)
         try:
