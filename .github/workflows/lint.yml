@@ -218,3 +218,19 @@ jobs:
           desktop-file-validate config/includes.chroot/usr/share/applications/*.desktop
           xvfb-run -a python3 tests/gtk-welcome-smoke.py
           echo "TTablet wallpaper defaults, launchers and GTK flows validated"
+
+  signed-flathub-remote:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      - name: Register signed Flathub after package initialization
+        run: |
+          set -eu
+          apt-get update
+          apt-get install -y --no-install-recommends flatpak python3 ca-certificates
+          mkdir -p /usr/share/flatpak/remotes.d
+          cp config/includes.chroot/usr/share/flatpak/remotes.d/flathub.flatpakrepo /usr/share/flatpak/remotes.d/
+          sh config/hooks/live/065-flathub-system-remote.hook.chroot
+          sh config/hooks/live/065-flathub-system-remote.hook.chroot
+          test -z "$(flatpak list --system --columns=ref)"

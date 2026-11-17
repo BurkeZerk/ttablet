@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+# Flatpak's package can initialize its system repo before includes.chroot stages
+# remotes.d. Register the local signed descriptor explicitly, without downloading
+# any app/runtime or requiring networking during installation/first login.
+flatpak remote-add --system --if-not-exists flathub /usr/share/flatpak/remotes.d/flathub.flatpakrepo
+flatpak remotes --system --columns=name | grep -qx flathub
+python3 - <<'PY'
+from configparser import ConfigParser
+from pathlib import Path
+config = ConfigParser()
+config.read('/var/lib/flatpak/repo/config')
+remote = config['remote "flathub"']
+assert remote['url'] == 'https://dl.flathub.org/repo/'
+assert remote.getboolean('gpg-verify')
+assert remote.getboolean('gpg-verify-summary')
+assert Path('/var/lib/flatpak/repo/flathub.trustedkeys.gpg').stat().st_size > 0
+PY

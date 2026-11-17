@@ -33,9 +33,8 @@ power-profiles-daemon
 gnome-session-xsession
 xserver-xorg
 
-# Bazaar setup uses a graphical confirmation and Console for download progress.
+# Bazaar setup shares the GTK Welcome confirmation and progress UI.
 flatpak
-zenity
 
 # Native updates remain independent of the Flatpak app store.
 gnome-software
