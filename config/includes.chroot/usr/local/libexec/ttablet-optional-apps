@@ -13,6 +13,10 @@ finish_setup() {
 }
 
 if [ "${1:-}" = --first-run ]; then
+    case ":${XDG_CURRENT_DESKTOP:-}:" in
+        *:Phosh:*) ;;
+        *) exit 0 ;;
+    esac
     if [ -e "$done_file" ] || grep -Eq '(^| )boot=live( |$)' /proc/cmdline; then
         exit 0
     fi

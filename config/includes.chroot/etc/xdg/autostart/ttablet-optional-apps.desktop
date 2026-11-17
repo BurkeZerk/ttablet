@@ -2,5 +2,4 @@
 Type=Application
 Name=TTablet Optional Apps
 Exec=/usr/local/libexec/ttablet-optional-apps --first-run
-OnlyShowIn=Phosh;
 Terminal=false
