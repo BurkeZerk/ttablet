@@ -25,7 +25,7 @@ jobs:
             sh -n "$file"
           done
           sh -n config/includes.chroot/usr/local/libexec/ttablet-set-phosh-session
-      - name: Test manifest architecture qualifier handling
+      - name: Test required manifest packages and architecture qualifiers
         run: |
           set -e
           positive=$(mktemp)
@@ -35,15 +35,24 @@ jobs:
           linux-image-surface 1.0
           phosh-tablet 1.0
           iptsd 1.0
+          wpasupplicant:amd64 2:2.10-24
+          wireless-regdb 1.0
           calamares-settings-debian 1.0
           dosfstools 4.2
           squashfs-tools 1:4.6.1-1
+          grub-efi 2.12
+          grub-efi-amd64 2.12
+          grub-efi-amd64-bin:amd64 2.12
+          grub2-common 2.12
+          efibootmgr 18
           intel-media-va-driver:amd64 25.2.3+dfsg1-1
           vainfo 2.0
           intel-gpu-tools 2.0
           MANIFEST
           bash scripts/check-manifest.sh "$positive"
-          for package in intel-media-va-driver dosfstools squashfs-tools; do
+          for package in wpasupplicant wireless-regdb grub-efi grub-efi-amd64 \
+              grub-efi-amd64-bin grub2-common efibootmgr intel-media-va-driver \
+              dosfstools squashfs-tools; do
             sed "/^$package[:[:space:]]/d" "$positive" > "$negative"
             if bash scripts/check-manifest.sh "$negative"; then
               echo "ERROR: missing $package was not detected" >&2
@@ -80,6 +89,26 @@ jobs:
             fi
           done
           echo "Exclusion checks passed"
+
+  offline-uefi-packages:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify the Calamares UEFI APT request works offline
+        run: |
+          set -eu
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update
+          installer_list=config/package-lists/30-installer.list.chroot
+          boot_packages=$(awk '$1 ~ /^(grub-efi|grub-efi-amd64|efibootmgr)$/ {print $1}' "$installer_list")
+          apt-get install -y --no-install-recommends $boot_packages
+          apt-get clean
+          # Match the helper's APT request with no sources or cached archives.
+          apt-get -y --no-download -o Dir::Etc::sourcelist=/dev/null \
+            -o Dir::Etc::sourceparts=- install grub-efi
+          test -x /usr/sbin/grub-install
+          test -x /usr/bin/efibootmgr
 
   calamares-password-policy:
     runs-on: ubuntu-latest

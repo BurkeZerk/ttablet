@@ -11,6 +11,10 @@ gnome-console
 # Bluetooth headphones and peripherals
 bluez
 
+# NetworkManager recommends these packages for Wi-Fi.
+wpasupplicant
+wireless-regdb
+
 # Secure privilege dialogs and graphical application/firmware updating
 polkitd
 gnome-software

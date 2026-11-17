@@ -14,9 +14,16 @@ required=(
   linux-image-surface
   phosh-tablet
   iptsd
+  wpasupplicant
+  wireless-regdb
   calamares-settings-debian
   dosfstools
   squashfs-tools
+  grub-efi
+  grub-efi-amd64
+  grub-efi-amd64-bin
+  grub2-common
+  efibootmgr
   intel-media-va-driver
   vainfo
   intel-gpu-tools

@@ -4,3 +4,8 @@ calamares-settings-debian
 dosfstools
 # Calamares requires unsquashfs when the live filesystem is SquashFS.
 squashfs-tools
+# Debian's Calamares helper requests grub-efi by name in the target.
+# Include the metapackage so APT does not need to fetch it offline.
+grub-efi
+grub-efi-amd64
+efibootmgr
