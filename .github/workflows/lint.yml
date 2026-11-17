@@ -20,6 +20,7 @@ jobs:
           done
       - name: Check Live Build configuration and POSIX hooks
         run: |
+          set -e
           sh -n auto/config
           for file in config/hooks/live/*.hook.chroot; do
             sh -n "$file"
@@ -144,6 +145,7 @@ jobs:
           sh "$hook" users.conf
           python3 - "$original" <<'PY'
           import sys
+          from pathlib import Path
 
           import yaml
 
